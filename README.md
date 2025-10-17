@@ -1,6 +1,6 @@
 # Partial Differential Equation (PDE) Solver
 
-Short description
+
 A small PDE solver project (OCaml / Dune-based). Implements numerical methods to solve typical partial differential equations and provides example problems, build scripts, and tests.
 
 ## Features
