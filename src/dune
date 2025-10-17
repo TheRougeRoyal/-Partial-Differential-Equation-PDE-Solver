@@ -1,0 +1,5 @@
+(library
+ (public_name pde_opt)
+ (name pde_opt)
+ (modules bs_params grid payoff bcs tridiag time_stepper pde1d api)
+ (flags (:standard -w -27)))

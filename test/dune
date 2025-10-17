@@ -1,0 +1,49 @@
+(executable
+ (public_name test_smoke)
+ (name test_smoke)
+ (modules test_smoke)
+ (libraries pde_opt))
+
+(executable
+ (public_name test_math)
+ (name test_math)
+ (modules test_math)
+ (libraries pde_opt))
+
+(executable
+ (public_name test_pde_integration)
+ (name test_pde_integration)
+ (modules test_pde_integration)
+ (libraries pde_opt))
+
+(executable
+ (public_name test_cli)
+ (name test_cli)
+ (modules test_cli)
+ (libraries pde_opt unix))
+
+(executable
+ (public_name test_params_grid)
+ (name test_params_grid)
+ (modules test_params_grid)
+ (libraries pde_opt))
+
+(rule
+ (alias runtest)
+ (action (run ./test_smoke.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_math.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_pde_integration.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_cli.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_params_grid.exe)))

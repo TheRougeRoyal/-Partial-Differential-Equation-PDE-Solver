@@ -1,0 +1,130 @@
+(lang dune 3.14)
+(name pde_opt)
+(sections (lib .) (libexec .) (bin ../../bin))
+(files
+ (lib
+  (META
+   api.ml
+   api.mli
+   bcs.ml
+   bcs.mli
+   bs_params.ml
+   bs_params.mli
+   dune-package
+   grid.ml
+   grid.mli
+   payoff.ml
+   payoff.mli
+   pde1d.ml
+   pde1d.mli
+   pde_opt.a
+   pde_opt.cma
+   pde_opt.cmi
+   pde_opt.cmt
+   pde_opt.cmx
+   pde_opt.cmxa
+   pde_opt.ml
+   pde_opt__Api.cmi
+   pde_opt__Api.cmt
+   pde_opt__Api.cmti
+   pde_opt__Api.cmx
+   pde_opt__Bcs.cmi
+   pde_opt__Bcs.cmt
+   pde_opt__Bcs.cmti
+   pde_opt__Bcs.cmx
+   pde_opt__Bs_params.cmi
+   pde_opt__Bs_params.cmt
+   pde_opt__Bs_params.cmti
+   pde_opt__Bs_params.cmx
+   pde_opt__Grid.cmi
+   pde_opt__Grid.cmt
+   pde_opt__Grid.cmti
+   pde_opt__Grid.cmx
+   pde_opt__Payoff.cmi
+   pde_opt__Payoff.cmt
+   pde_opt__Payoff.cmti
+   pde_opt__Payoff.cmx
+   pde_opt__Pde1d.cmi
+   pde_opt__Pde1d.cmt
+   pde_opt__Pde1d.cmti
+   pde_opt__Pde1d.cmx
+   pde_opt__Time_stepper.cmi
+   pde_opt__Time_stepper.cmt
+   pde_opt__Time_stepper.cmti
+   pde_opt__Time_stepper.cmx
+   pde_opt__Tridiag.cmi
+   pde_opt__Tridiag.cmt
+   pde_opt__Tridiag.cmti
+   pde_opt__Tridiag.cmx
+   time_stepper.ml
+   time_stepper.mli
+   tridiag.ml
+   tridiag.mli))
+ (libexec (pde_opt.cmxs))
+ (bin
+  (pde_opt
+   test_cli
+   test_math
+   test_params_grid
+   test_pde_integration
+   test_smoke)))
+(library
+ (name pde_opt)
+ (kind normal)
+ (archives (byte pde_opt.cma) (native pde_opt.cmxa))
+ (plugins (byte pde_opt.cma) (native pde_opt.cmxs))
+ (native_archives pde_opt.a)
+ (main_module_name Pde_opt)
+ (modes byte native)
+ (modules
+  (wrapped
+   (group
+    (alias
+     (obj_name pde_opt)
+     (visibility public)
+     (kind alias)
+     (source (path Pde_opt) (impl (path pde_opt.ml-gen))))
+    (name Pde_opt)
+    (modules
+     (module
+      (obj_name pde_opt__Api)
+      (visibility public)
+      (source (path Api) (intf (path api.mli)) (impl (path api.ml))))
+     (module
+      (obj_name pde_opt__Bcs)
+      (visibility public)
+      (source (path Bcs) (intf (path bcs.mli)) (impl (path bcs.ml))))
+     (module
+      (obj_name pde_opt__Bs_params)
+      (visibility public)
+      (source
+       (path Bs_params)
+       (intf (path bs_params.mli))
+       (impl (path bs_params.ml))))
+     (module
+      (obj_name pde_opt__Grid)
+      (visibility public)
+      (source (path Grid) (intf (path grid.mli)) (impl (path grid.ml))))
+     (module
+      (obj_name pde_opt__Payoff)
+      (visibility public)
+      (source (path Payoff) (intf (path payoff.mli)) (impl (path payoff.ml))))
+     (module
+      (obj_name pde_opt__Pde1d)
+      (visibility public)
+      (source (path Pde1d) (intf (path pde1d.mli)) (impl (path pde1d.ml))))
+     (module
+      (obj_name pde_opt__Time_stepper)
+      (visibility public)
+      (source
+       (path Time_stepper)
+       (intf (path time_stepper.mli))
+       (impl (path time_stepper.ml))))
+     (module
+      (obj_name pde_opt__Tridiag)
+      (visibility public)
+      (source
+       (path Tridiag)
+       (intf (path tridiag.mli))
+       (impl (path tridiag.ml))))))
+   (wrapped true))))

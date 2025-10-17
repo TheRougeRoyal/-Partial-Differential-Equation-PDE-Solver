@@ -1,0 +1,4 @@
+(executable
+ (public_name pde_opt)
+ (name main)
+ (libraries pde_opt))
