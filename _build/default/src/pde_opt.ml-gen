@@ -3,14 +3,23 @@
 (** @canonical Pde_opt.Api *)
 module Api = Pde_opt__Api
 
+(** @canonical Pde_opt.Backtesting *)
+module Backtesting = Pde_opt__Backtesting
+
 (** @canonical Pde_opt.Bcs *)
 module Bcs = Pde_opt__Bcs
 
 (** @canonical Pde_opt.Bs_params *)
 module Bs_params = Pde_opt__Bs_params
 
+(** @canonical Pde_opt.Calibration *)
+module Calibration = Pde_opt__Calibration
+
 (** @canonical Pde_opt.Grid *)
 module Grid = Pde_opt__Grid
+
+(** @canonical Pde_opt.Market_data *)
+module Market_data = Pde_opt__Market_data
 
 (** @canonical Pde_opt.Payoff *)
 module Payoff = Pde_opt__Payoff

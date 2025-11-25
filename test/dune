@@ -28,6 +28,24 @@
  (modules test_params_grid)
  (libraries pde_opt))
 
+(executable
+ (public_name test_convergence)
+ (name test_convergence)
+ (modules test_convergence)
+ (libraries pde_opt unix))
+
+(executable
+ (public_name test_edge_cases)
+ (name test_edge_cases)
+ (modules test_edge_cases)
+ (libraries pde_opt unix))
+
+(executable
+ (public_name test_real_world)
+ (name test_real_world)
+ (modules test_real_world)
+ (libraries pde_opt unix))
+
 (rule
  (alias runtest)
  (action (run ./test_smoke.exe)))
@@ -47,3 +65,15 @@
 (rule
  (alias runtest)
  (action (run ./test_params_grid.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_convergence.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_edge_cases.exe)))
+
+(rule
+ (alias runtest)
+ (action (run ./test_real_world.exe)))

@@ -1,8 +1,7 @@
-(** CLI application for OCaml PDE Foundation option pricing *)
+
 
 open Pde_opt
 
-(* Command-line argument storage *)
 let s0 = ref 100.0
 let k = ref 100.0  
 let t = ref 1.0
@@ -13,16 +12,20 @@ let scheme_str = ref "CN"
 let ns = ref 200
 let nt = ref 200
 let smin = ref None  (* None means auto-calculate *)
-let smax = ref None  (* None means auto-calculate *)
+let smax = ref None  
 let verbose = ref false
+let csv_file = ref None  (* Path to historical data CSV *)
+let use_adaptive_grid = ref false
+let run_backtest = ref false
+let backtest_output = ref None
+let vol_method_str = ref "combined"
 
-(* Argument parsing specification *)
 let spec = [
-  ("--s0", Arg.Set_float s0, " Current asset price (default: 100.0)");
+  ("--s0", Arg.Set_float s0, " Current asset price (default: 100.0 or from CSV)");
   ("--k", Arg.Set_float k, " Strike price (default: 100.0)");
   ("--t", Arg.Set_float t, " Time to maturity in years (default: 1.0)");
-  ("--r", Arg.Set_float r, " Risk-free rate per annum (default: 0.05)");
-  ("--sigma", Arg.Set_float sigma, " Volatility per annum (default: 0.2)");
+  ("--r", Arg.Set_float r, " Risk-free rate per annum (default: 0.05 or calibrated)");
+  ("--sigma", Arg.Set_float sigma, " Volatility per annum (default: 0.2 or calibrated)");
   ("--payoff", Arg.Set_string payoff_str, " Option type: call|put (default: call)");
   ("--scheme", Arg.Set_string scheme_str, " Time scheme: BE|CN (default: CN)");
   ("--ns", Arg.Set_int ns, " Number of spatial intervals (default: 200)");
@@ -30,11 +33,20 @@ let spec = [
   ("--smin", Arg.Float (fun x -> smin := Some x), " Minimum asset price (default: auto)");
   ("--smax", Arg.Float (fun x -> smax := Some x), " Maximum asset price (default: auto)");
   ("--verbose", Arg.Set verbose, " Show detailed diagnostics");
+  ("--csv", Arg.String (fun x -> csv_file := Some x), " Path to historical market data CSV");
+  ("--adaptive", Arg.Set use_adaptive_grid, " Use adaptive grid based on market data");
+  ("--vol-method", Arg.Set_string vol_method_str, " Volatility calibration: simple|ewma|combined (default: combined)");
+  ("--backtest", Arg.Set run_backtest, " Run backtesting on historical data");
+  ("--backtest-output", Arg.String (fun x -> backtest_output := Some x), " Export backtest results to CSV");
 ]
 
-let usage_msg = "pde_opt [options]\nOCaml PDE Foundation for Option Pricing"
+let usage_msg = "pde_opt [options]\nOCaml PDE Foundation for Option Pricing\n\
+                  \nData-Driven Mode:\n\
+                  Use --csv <file> to calibrate parameters from historical data.\n\
+                  Use --adaptive to enable adaptive grid boundaries.\n\
+                  Use --backtest to validate model against historical data."
 
-(* Parse payoff type *)
+
 let parse_payoff payoff_str =
   match String.lowercase_ascii payoff_str with
   | "call" -> `Call
@@ -50,6 +62,16 @@ let parse_scheme scheme_str =
   | "CN" -> `CN
   | _ ->
       Printf.eprintf "Error: Invalid scheme '%s'. Must be 'BE' or 'CN'.\n" scheme_str;
+      exit 1
+
+(* Parse volatility calibration method *)
+let parse_vol_method method_str =
+  match String.lowercase_ascii method_str with
+  | "simple" -> Pde_opt.Calibration.Simple 60  (* 60-day window *)
+  | "ewma" -> Pde_opt.Calibration.EWMA 0.94
+  | "combined" -> Pde_opt.Calibration.Combined
+  | _ ->
+      Printf.eprintf "Error: Invalid vol method '%s'. Must be 'simple', 'ewma', or 'combined'.\n" method_str;
       exit 1
 
 (* Validate numeric parameters *)
@@ -151,31 +173,99 @@ let validate_parameters () =
       exit 1
 
 let main () =
-  (* Parse command-line arguments *)
   Arg.parse spec (fun _ -> ()) usage_msg;
   
   try
-    (* Validate parameters and create structures *)
-    let (params, grid) = validate_parameters () in
     let payoff = parse_payoff !payoff_str in
     let scheme = parse_scheme !scheme_str in
     
-    (* Compute option price *)
-    let (pde_price, abs_error) = Api.price_euro ~params ~grid ~s0:!s0 ~scheme ~payoff in
+    (* Check if we're in data-driven mode *)
+    match !csv_file with
+    | Some csv_path ->
+        (* Data-driven mode: calibrate from CSV *)
+        Printf.printf "\n=== Data-Driven Mode ===\n";
+        Printf.printf "Loading historical data from: %s\n" csv_path;
+        
+        let market_data = Pde_opt.Market_data.parse_csv csv_path in
+        let vol_method = parse_vol_method !vol_method_str in
+        
+        (* Calibrate parameters from data *)
+        let (params, calib_info) = Pde_opt.Bs_params.from_csv csv_path ~k:!k ~t:!t ~vol_method () in
+        Printf.printf "\n%s\n" calib_info;
+        
+        (* Use latest close price as s0 if not explicitly provided *)
+        let current_s0 = 
+          if !s0 = 100.0 then  (* Default value, use from data *)
+            Pde_opt.Market_data.latest_close market_data
+          else
+            !s0
+        in
+        Printf.printf "Current asset price (S0): %.2f\n" current_s0;
+        
+        (* Create grid (adaptive or manual) *)
+        let grid = 
+          if !use_adaptive_grid then (
+            Printf.printf "Using adaptive grid based on market data\n";
+            Pde_opt.Grid.make_adaptive market_data current_s0 params ~n_s:!ns ~n_t:!nt
+          ) else (
+            let (_, grid_manual) = validate_parameters () in
+            grid_manual
+          )
+        in
+        
+        (* Run backtesting if requested *)
+        if !run_backtest then (
+          Printf.printf "\n=== Running Backtest ===\n";
+          let backtest_stats = Pde_opt.Backtesting.run_backtest 
+            market_data params !k payoff !t scheme in
+          Pde_opt.Backtesting.print_summary backtest_stats;
+          
+          (* Export results if requested *)
+          (match !backtest_output with
+           | Some output_file -> 
+               Pde_opt.Backtesting.export_to_csv output_file backtest_stats
+           | None -> ());
+        );
+        
+        (* Compute option price for current conditions *)
+        Printf.printf "\n=== Current Option Pricing ===\n";
+        let (pde_price, abs_error) = Pde_opt.Api.price_euro ~params ~grid ~s0:current_s0 ~scheme ~payoff in
+        
+        (* Compute analytic price for comparison *)
+        let analytic_price = Pde_opt.Payoff.analytic_black_scholes payoff 
+                              ~r:params.Pde_opt.Bs_params.r 
+                              ~sigma:params.Pde_opt.Bs_params.sigma 
+                              ~t:!t ~s0:current_s0 ~k:!k in
+        
+        (* Display results *)
+        let scheme_name = match scheme with `BE -> "BE" | `CN -> "CN" in
+        let payoff_name = match payoff with `Call -> "Call" | `Put -> "Put" in
+        Printf.printf "PDE %s %s price: %.5f\n" scheme_name payoff_name pde_price;
+        Printf.printf "Analytic %s price: %.5f\n" payoff_name analytic_price;
+        Printf.printf "Abs error: %.5f\n" abs_error;
+        
+        exit 0
     
-    (* Compute analytic price for comparison *)
-    let analytic_price = Payoff.analytic_black_scholes payoff 
-                          ~r:!r ~sigma:!sigma ~t:!t ~s0:!s0 ~k:!k in
-    
-    (* Display results *)
-    let scheme_name = match scheme with `BE -> "BE" | `CN -> "CN" in
-    let payoff_name = match payoff with `Call -> "Call" | `Put -> "Put" in
-    Printf.printf "PDE %s %s price: %.5f\n" scheme_name payoff_name pde_price;
-    Printf.printf "Analytic %s price: %.5f\n" payoff_name analytic_price;
-    Printf.printf "Abs error: %.5f\n" abs_error;
-    
-    (* Success exit *)
-    exit 0
+    | None ->
+        (* Traditional mode: use manual parameters *)
+        Printf.printf "\n=== Manual Parameter Mode ===\n";
+        let (params, grid) = validate_parameters () in
+        
+        (* Compute option price *)
+        let (pde_price, abs_error) = Pde_opt.Api.price_euro ~params ~grid ~s0:!s0 ~scheme ~payoff in
+        
+        (* Compute analytic price for comparison *)
+        let analytic_price = Pde_opt.Payoff.analytic_black_scholes payoff 
+                              ~r:!r ~sigma:!sigma ~t:!t ~s0:!s0 ~k:!k in
+        
+        (* Display results *)
+        let scheme_name = match scheme with `BE -> "BE" | `CN -> "CN" in
+        let payoff_name = match payoff with `Call -> "Call" | `Put -> "Put" in
+        Printf.printf "PDE %s %s price: %.5f\n" scheme_name payoff_name pde_price;
+        Printf.printf "Analytic %s price: %.5f\n" payoff_name analytic_price;
+        Printf.printf "Abs error: %.5f\n" abs_error;
+        
+        exit 0
     
   with
   | Invalid_argument msg ->

@@ -1,18 +1,24 @@
-(lang dune 3.14)
+(lang dune 3.20)
 (name pde_opt)
-(sections (lib .) (libexec .) (bin ../../bin))
+(sections (lib .) (libexec .) (bin ../../bin) (doc ../../doc/pde_opt))
 (files
  (lib
   (META
    api.ml
    api.mli
+   backtesting.ml
+   backtesting.mli
    bcs.ml
    bcs.mli
    bs_params.ml
    bs_params.mli
+   calibration.ml
+   calibration.mli
    dune-package
    grid.ml
    grid.mli
+   market_data.ml
+   market_data.mli
    payoff.ml
    payoff.mli
    pde1d.ml
@@ -28,6 +34,10 @@
    pde_opt__Api.cmt
    pde_opt__Api.cmti
    pde_opt__Api.cmx
+   pde_opt__Backtesting.cmi
+   pde_opt__Backtesting.cmt
+   pde_opt__Backtesting.cmti
+   pde_opt__Backtesting.cmx
    pde_opt__Bcs.cmi
    pde_opt__Bcs.cmt
    pde_opt__Bcs.cmti
@@ -36,10 +46,18 @@
    pde_opt__Bs_params.cmt
    pde_opt__Bs_params.cmti
    pde_opt__Bs_params.cmx
+   pde_opt__Calibration.cmi
+   pde_opt__Calibration.cmt
+   pde_opt__Calibration.cmti
+   pde_opt__Calibration.cmx
    pde_opt__Grid.cmi
    pde_opt__Grid.cmt
    pde_opt__Grid.cmti
    pde_opt__Grid.cmx
+   pde_opt__Market_data.cmi
+   pde_opt__Market_data.cmt
+   pde_opt__Market_data.cmti
+   pde_opt__Market_data.cmx
    pde_opt__Payoff.cmi
    pde_opt__Payoff.cmt
    pde_opt__Payoff.cmti
@@ -64,10 +82,14 @@
  (bin
   (pde_opt
    test_cli
+   test_convergence
+   test_edge_cases
    test_math
    test_params_grid
    test_pde_integration
-   test_smoke)))
+   test_real_world
+   test_smoke))
+ (doc (LICENSE README.md)))
 (library
  (name pde_opt)
  (kind normal)
@@ -91,6 +113,13 @@
       (visibility public)
       (source (path Api) (intf (path api.mli)) (impl (path api.ml))))
      (module
+      (obj_name pde_opt__Backtesting)
+      (visibility public)
+      (source
+       (path Backtesting)
+       (intf (path backtesting.mli))
+       (impl (path backtesting.ml))))
+     (module
       (obj_name pde_opt__Bcs)
       (visibility public)
       (source (path Bcs) (intf (path bcs.mli)) (impl (path bcs.ml))))
@@ -102,9 +131,23 @@
        (intf (path bs_params.mli))
        (impl (path bs_params.ml))))
      (module
+      (obj_name pde_opt__Calibration)
+      (visibility public)
+      (source
+       (path Calibration)
+       (intf (path calibration.mli))
+       (impl (path calibration.ml))))
+     (module
       (obj_name pde_opt__Grid)
       (visibility public)
       (source (path Grid) (intf (path grid.mli)) (impl (path grid.ml))))
+     (module
+      (obj_name pde_opt__Market_data)
+      (visibility public)
+      (source
+       (path Market_data)
+       (intf (path market_data.mli))
+       (impl (path market_data.ml))))
      (module
       (obj_name pde_opt__Payoff)
       (visibility public)

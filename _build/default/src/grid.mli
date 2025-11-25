@@ -59,3 +59,13 @@ val s_at : t -> int -> float
     @return Bracketing index (clamped to [0, n_s-1])
     @raise Invalid_argument if s is not finite *)
 val find_bracketing_index : t -> float -> int
+
+(** Create grid with adaptive bounds based on market data and parameters
+    @param market_data historical market data
+    @param current_price current asset price (s0)
+    @param params Black-Scholes parameters
+    @param n_s number of spatial intervals
+    @param n_t number of time intervals
+    @return grid with data-driven bounds *)
+val make_adaptive : 
+  Market_data.t -> float -> Bs_params.t -> n_s:int -> n_t:int -> t

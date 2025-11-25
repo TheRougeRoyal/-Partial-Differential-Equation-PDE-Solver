@@ -24,3 +24,20 @@ type t = {
     @return Validated parameter record
     @raise Invalid_argument if any parameter violates constraints *)
 val make : r:float -> sigma:float -> k:float -> t:float -> t
+
+(** Create parameters from calibrated market data
+    @param calibrated_params calibration results
+    @param k strike price
+    @param t time to maturity
+    @return validated Black-Scholes parameters *)
+val from_calibration : Calibration.calibrated_params -> k:float -> t:float -> t
+
+(** Create parameters with automatic calibration from CSV file
+    @param csv_file path to historical market data CSV
+    @param k strike price
+    @param t time to maturity
+    @param vol_method volatility calibration method (default: Combined)
+    @return (parameters, calibration_info_string) *)
+val from_csv : 
+  string -> k:float -> t:float -> ?vol_method:Calibration.vol_method -> 
+  unit -> t * string

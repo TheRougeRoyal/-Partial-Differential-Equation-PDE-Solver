@@ -50,3 +50,11 @@ let find_bracketing_index grid s =
   (* Use floor and clamp to valid range *)
   let index = Int.max 0 (Int.min (grid.n_s - 1) (int_of_float (floor frac_index))) in
   index
+
+let make_adaptive market_data current_price params ~n_s ~n_t =
+  (* Get recommended bounds based on historical data and volatility *)
+  let (s_min, s_max) = Calibration.recommend_grid_bounds 
+    market_data current_price params.Bs_params.sigma params.Bs_params.t in
+  
+  (* Create grid with adaptive bounds *)
+  make ~s_min ~s_max ~n_s ~n_t ()
