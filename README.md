@@ -3,14 +3,50 @@
 A sophisticated PDE solver project (OCaml / Dune-based) for pricing financial derivatives using finite difference methods. Implements Black-Scholes PDE with **data-driven parameter calibration** from historical market data.
 
 ## Features
+- **Simple Pricing API**: Clean, elegant interface for European options
+- **Complete Greeks**: Automatic Delta, Gamma, Theta, Vega computation
 - **Black-Scholes PDE Solver**: European call/put option pricing with multiple numerical schemes (Backward Euler, Crank-Nicolson)
 - **Data-Driven Calibration**: Automatic parameter estimation from historical CSV data
   - Multiple volatility estimation methods (Simple, EWMA, Combined)
   - Drift and risk-free rate estimation
   - Adaptive grid boundary selection
 - **Backtesting Framework**: Validate model accuracy against historical data
-- **Comprehensive Test Suite**: Unit tests, integration tests, convergence analysis
+- **Batch Processing**: Price multiple options efficiently
+- **High Accuracy**: Typical errors <0.001 vs analytical Black-Scholes
 - **Production-Ready**: Robust error handling, parameter validation, detailed diagnostics
+
+## New Pricing Model
+
+We've added a simple, elegant pricing model on top of the PDE solver:
+
+```ocaml
+open Pde_opt
+
+let call = Pricing.{
+  spot = 100.0;
+  strike = 100.0;
+  maturity = 1.0;
+  rate = 0.05;
+  volatility = 0.2;
+  option_type = Call;
+}
+
+let result = Pricing.price_option call in
+Pricing.print_output result
+```
+
+Output:
+```
+Price: 10.45042
+Analytic: 10.45058
+Error: 0.00015
+Delta: 0.63792
+Gamma: 0.02016
+Theta: -6.42444
+Vega: 37.57397
+```
+
+See [PRICING_MODEL.md](PRICING_MODEL.md) for comprehensive documentation.
 
 ## Repository layout
 - src/          — source code
@@ -45,6 +81,19 @@ To clean build artifacts:
 dune clean
 
 ## Run
+
+### Quick Start with Pricing Model
+
+```bash
+# Run simple examples
+dune exec example_pricing
+
+# Price with market data
+dune exec market_pricing
+
+# Analyze Greeks
+dune exec greeks_analysis
+```
 
 ### Basic Usage (Manual Parameters)
 ```bash

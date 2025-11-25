@@ -2,3 +2,18 @@
  (public_name pde_opt)
  (name main)
  (libraries pde_opt))
+
+(executable
+ (public_name example_pricing)
+ (name example_pricing)
+ (libraries pde_opt))
+
+(executable
+ (public_name market_pricing)
+ (name market_pricing)
+ (libraries pde_opt))
+
+(executable
+ (public_name greeks_analysis)
+ (name greeks_analysis)
+ (libraries pde_opt))
