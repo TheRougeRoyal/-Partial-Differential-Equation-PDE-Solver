@@ -1,22 +1,13 @@
-(** Edge case tests for PDE solver
-    
-    This test suite focuses on boundary conditions, extreme parameters,
-    and special cases. Each test is clearly documented and easy to understand.
-*)
-
 open Pde_opt
 
-(** Print formatted test header *)
 let print_header title =
   Printf.printf "\n╔══════════════════════════════════════════════╗\n";
   Printf.printf "║  %-42s  ║\n" title;
   Printf.printf "╚══════════════════════════════════════════════╝\n"
 
-(** Print test case name *)
 let print_test name =
   Printf.printf "\n  → Testing: %s\n" name
 
-(** Assert condition with message *)
 let assert_true condition message =
   if not condition then (
     Printf.printf "    ✗ FAIL: %s\n" message;
@@ -24,13 +15,10 @@ let assert_true condition message =
   ) else
     Printf.printf "    ✓ PASS: %s\n" message
 
-(** Test options at expiry (T=0) *)
 let test_at_expiry_options () =
   print_header "At-Expiry Options (T=0)";
   
-  (* At expiry, option value = max(payoff, 0) *)
   let test_cases = [
-    (* (s0, k, payoff_type, expected_value, description) *)
     (110.0, 100.0, `Call, 10.0, "ITM Call at expiry");
     (95.0, 100.0, `Call, 0.0, "OTM Call at expiry");
     (100.0, 100.0, `Call, 0.0, "ATM Call at expiry");
@@ -55,7 +43,6 @@ let test_at_expiry_options () =
       "Error should be zero at expiry";
   ) test_cases
 
-(** Test deep in-the-money options *)
 let test_deep_itm_options () =
   print_header "Deep In-The-Money Options";
   
@@ -71,7 +58,6 @@ let test_deep_itm_options () =
   Printf.printf "      PDE price: %.6f\n" call_price;
   Printf.printf "      Analytic:  %.6f\n" analytic_call;
   
-  (* Deep ITM call should be approximately S - K*exp(-r*T) *)
   let approx_value = s0 -. 100.0 *. Float.exp (-.0.05 *. 1.0) in
   Printf.printf "      Approx (S - K*e^(-rT)): %.6f\n" approx_value;
   
@@ -83,7 +69,6 @@ let test_deep_itm_options () =
   
   print_test "Deep ITM Put (S=50, K=100)";
   let params_put = Bs_params.make ~r:0.05 ~sigma:0.2 ~k:100.0 ~t:1.0 in
-  (* Use grid appropriate for low stock prices - must include S=0 for put boundary *)
   let grid_put = Grid.make ~s_min:0.0 ~s_max:150.0 ~n_s:100 ~n_t:50 () in
   let s0_put = 50.0 in
   let (put_price, _) = Api.price_euro ~params:params_put ~grid:grid_put ~s0:s0_put ~scheme:`CN ~payoff:`Put in
@@ -99,7 +84,6 @@ let test_deep_itm_options () =
   assert_true (Float.abs (put_price -. analytic_put) < 0.5)
     "PDE price close to analytic solution"
 
-(** Test deep out-of-the-money options *)
 let test_deep_otm_options () =
   print_header "Deep Out-of-The-Money Options";
   
@@ -136,7 +120,6 @@ let test_deep_otm_options () =
   assert_true (Float.abs (put_price -. analytic_put) < 0.05)
     "PDE price close to analytic solution"
 
-(** Test high volatility scenarios *)
 let test_high_volatility () =
   print_header "High Volatility Scenarios";
   
@@ -159,7 +142,6 @@ let test_high_volatility () =
   assert_true (error < 0.5)
     "Error acceptable even for high volatility"
 
-(** Test low volatility scenarios *)
 let test_low_volatility () =
   print_header "Low Volatility Scenarios";
   
@@ -182,7 +164,6 @@ let test_low_volatility () =
   assert_true (error < 0.1)
     "Low volatility should be easy to price accurately"
 
-(** Test long-dated options *)
 let test_long_dated_options () =
   print_header "Long-Dated Options";
   
@@ -205,7 +186,6 @@ let test_long_dated_options () =
   assert_true (error < 0.5)
     "Reasonable error for long-dated options"
 
-(** Test short-dated options *)
 let test_short_dated_options () =
   print_header "Short-Dated Options";
   
@@ -228,7 +208,6 @@ let test_short_dated_options () =
   assert_true (error < 0.05)
     "Short-dated options should price accurately"
 
-(** Test zero interest rate *)
 let test_zero_interest_rate () =
   print_header "Zero Interest Rate";
   
@@ -251,7 +230,6 @@ let test_zero_interest_rate () =
   assert_true (error < 0.1)
     "Zero rate pricing should be accurate"
 
-(** Main test runner *)
 let main () =
   Printf.printf "\n";
   Printf.printf "╔════════════════════════════════════════════════╗\n";
@@ -260,7 +238,6 @@ let main () =
   
   let start_time = Unix.gettimeofday () in
   
-  (* Run all edge case tests *)
   test_at_expiry_options ();
   test_deep_itm_options ();
   test_deep_otm_options ();

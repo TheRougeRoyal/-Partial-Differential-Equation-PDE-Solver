@@ -1,5 +1,3 @@
-(** Backtesting framework for validating option pricing models *)
-
 type test_result = {
   date: string;
   actual_price: float;
@@ -25,20 +23,15 @@ let run_backtest market_data params strike payoff time_to_maturity scheme =
   if n < 10 then
     invalid_arg "Insufficient data for backtesting (need at least 10 points)";
   
-  (* Create grid for pricing *)
   let grid = Grid.make_adaptive market_data 
     (Market_data.latest_close market_data) params ~n_s:200 ~n_t:200 in
   
-  (* Run pricing for each data point *)
   let results = Array.mapi (fun i dp ->
     let s0 = dp.Market_data.close in
     
-    (* Price the option using the PDE solver *)
     let (predicted_price, _) = Api.price_euro 
       ~params ~grid ~s0 ~scheme ~payoff in
     
-    (* For backtesting, we use the actual price as the intrinsic value
-       (This is a simplification - in practice you'd use actual market option prices) *)
     let actual_price = Payoff.terminal payoff ~k:strike s0 in
     
     let error = predicted_price -. actual_price in
@@ -58,7 +51,6 @@ let run_backtest market_data params strike payoff time_to_maturity scheme =
     }
   ) data_points in
   
-  (* Calculate aggregate statistics *)
   let sum_abs_error = Array.fold_left (fun acc r -> 
     acc +. Float.abs r.error) 0.0 results in
   let sum_rel_error = Array.fold_left (fun acc r -> 
@@ -72,7 +64,6 @@ let run_backtest market_data params strike payoff time_to_maturity scheme =
   let mean_rel_error = sum_rel_error /. float_of_int n in
   let rmse = Float.sqrt (sum_sq_error /. float_of_int n) in
   
-  (* Calculate correlation coefficient *)
   let actual_mean = Array.fold_left (fun acc r -> 
     acc +. r.actual_price) 0.0 results /. float_of_int n in
   let predicted_mean = Array.fold_left (fun acc r -> 
@@ -122,10 +113,8 @@ let print_summary stats =
 let export_to_csv filename stats =
   let oc = open_out filename in
   
-  (* Write header *)
   Printf.fprintf oc "Date,Actual,Predicted,Error,RelativeError\n";
   
-  (* Write results *)
   Array.iter (fun r ->
     Printf.fprintf oc "%s,%.4f,%.4f,%.4f,%.4f\n"
       r.date r.actual_price r.predicted_price r.error r.relative_error
