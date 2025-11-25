@@ -17,3 +17,43 @@
  (public_name greeks_analysis)
  (name greeks_analysis)
  (libraries pde_opt))
+
+(executable
+ (public_name crypto_predict)
+ (name crypto_predict)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_backtest)
+ (name crypto_backtest)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_dashboard)
+ (name crypto_dashboard)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_api_example)
+ (name crypto_api_example)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_complete_example)
+ (name crypto_complete_example)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_live)
+ (name crypto_live)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_live_predict)
+ (name crypto_live_predict)
+ (libraries pde_opt))
+
+(executable
+ (public_name crypto_live_monitor)
+ (name crypto_live_monitor)
+ (libraries pde_opt unix))

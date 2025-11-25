@@ -1,6 +1,0 @@
-description = ""
-requires = ""
-archive(byte) = "pde_opt.cma"
-archive(native) = "pde_opt.cmxa"
-plugin(byte) = "pde_opt.cma"
-plugin(native) = "pde_opt.cmxs"

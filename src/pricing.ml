@@ -47,7 +47,7 @@ let price_option ?(n_s=200) ?(n_t=200) ?(scheme=`CN) input =
     ~t:input.maturity in
   
   let s_min = match input.option_type with
-    | Call -> Float.max 1.0 (0.3 *. Float.min input.spot input.strike)
+    | Call -> Float.max (0.01 *. input.spot) (0.3 *. Float.min input.spot input.strike)
     | Put -> 0.0
   in
   

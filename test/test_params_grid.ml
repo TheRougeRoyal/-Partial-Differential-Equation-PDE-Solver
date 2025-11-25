@@ -1,15 +1,11 @@
-(** Unit tests for parameter and grid modules *)
-
 open Pde_opt
 
 let test_bs_params_validation () =
   Printf.printf "Testing BS_params validation edge cases...\n";
   
-  (* Test valid parameter creation *)
   let _valid_params = Bs_params.make ~r:0.05 ~sigma:0.2 ~k:100.0 ~t:1.0 in
   Printf.printf "Valid parameters created successfully\n";
   
-  (* Test edge cases for risk-free rate *)
   let _zero_r = Bs_params.make ~r:0.0 ~sigma:0.2 ~k:100.0 ~t:1.0 in
   Printf.printf "Zero risk-free rate accepted\n";
   
@@ -19,7 +15,6 @@ let test_bs_params_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test edge cases for volatility *)
   (try
     let _ = Bs_params.make ~r:0.05 ~sigma:0.0 ~k:100.0 ~t:1.0 in
     Printf.printf "FAIL: Should reject zero volatility\n";
@@ -32,7 +27,6 @@ let test_bs_params_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test edge cases for strike price *)
   (try
     let _ = Bs_params.make ~r:0.05 ~sigma:0.2 ~k:0.0 ~t:1.0 in
     Printf.printf "FAIL: Should reject zero strike price\n";
@@ -45,7 +39,6 @@ let test_bs_params_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test edge cases for time to maturity *)
   let _zero_t = Bs_params.make ~r:0.05 ~sigma:0.2 ~k:100.0 ~t:0.0 in
   Printf.printf "Zero time to maturity accepted\n";
   
@@ -55,7 +48,6 @@ let test_bs_params_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test infinite values *)
   (try
     let _ = Bs_params.make ~r:(1.0 /. 0.0) ~sigma:0.2 ~k:100.0 ~t:1.0 in
     Printf.printf "FAIL: Should reject infinite risk-free rate\n";
@@ -73,15 +65,12 @@ let test_bs_params_validation () =
 let test_grid_generation_and_indexing () =
   Printf.printf "Testing Grid generation and indexing functions...\n";
   
-  (* Test basic grid creation *)
   let grid1 = Grid.make ~s_max:100.0 ~n_s:10 ~n_t:20 () in
   Printf.printf "Basic grid created successfully\n";
   
-  (* Test grid with custom s_min *)
   let grid2 = Grid.make ~s_min:10.0 ~s_max:200.0 ~n_s:50 ~n_t:100 () in
   Printf.printf "Grid with custom s_min created successfully\n";
   
-  (* Test ds calculation *)
   let ds1 = Grid.ds grid1 in
   let expected_ds1 = 100.0 /. 10.0 in
   if Float.abs (ds1 -. expected_ds1) > 1e-12 then (
@@ -96,7 +85,6 @@ let test_grid_generation_and_indexing () =
     exit 1
   );
   
-  (* Test dt calculation *)
   let dt1 = Grid.dt grid1 2.0 in
   let expected_dt1 = 2.0 /. 20.0 in
   if Float.abs (dt1 -. expected_dt1) > 1e-12 then (
@@ -104,7 +92,6 @@ let test_grid_generation_and_indexing () =
     exit 1
   );
   
-  (* Test s_at calculation *)
   for i = 0 to 10 do
     let s_i = Grid.s_at grid1 i in
     let expected_s_i = Float.of_int i *. ds1 in
@@ -123,7 +110,6 @@ let test_grid_generation_and_indexing () =
     );
   done;
   
-  (* Test find_bracketing_index *)
   let test_values = [| 15.0; 35.7; 67.3; 89.1 |] in
   Array.iter (fun s ->
     let index = Grid.find_bracketing_index grid1 s in
@@ -137,7 +123,6 @@ let test_grid_generation_and_indexing () =
     );
   ) test_values;
   
-  (* Test boundary cases for find_bracketing_index *)
   let left_index = Grid.find_bracketing_index grid1 (-10.0) in
   if left_index <> 0 then (
     Printf.printf "FAIL: find_bracketing_index should return 0 for values below s_min\n";
@@ -155,7 +140,6 @@ let test_grid_generation_and_indexing () =
 let test_grid_parameter_validation () =
   Printf.printf "Testing Grid parameter validation...\n";
   
-  (* Test invalid n_s *)
   (try
     let _ = Grid.make ~s_max:100.0 ~n_s:1 ~n_t:10 () in
     Printf.printf "FAIL: Should reject n_s < 2\n";
@@ -168,7 +152,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test invalid n_t *)
   (try
     let _ = Grid.make ~s_max:100.0 ~n_s:10 ~n_t:0 () in
     Printf.printf "FAIL: Should reject n_t < 1\n";
@@ -181,7 +164,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test invalid domain *)
   (try
     let _ = Grid.make ~s_min:100.0 ~s_max:50.0 ~n_s:10 ~n_t:10 () in
     Printf.printf "FAIL: Should reject s_max <= s_min\n";
@@ -194,7 +176,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test infinite/NaN values *)
   (try
     let _ = Grid.make ~s_max:(1.0 /. 0.0) ~n_s:10 ~n_t:10 () in
     Printf.printf "FAIL: Should reject infinite s_max\n";
@@ -207,7 +188,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test dt with invalid maturity *)
   let grid = Grid.make ~s_max:100.0 ~n_s:10 ~n_t:10 () in
   
   (try
@@ -222,7 +202,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test s_at with invalid indices *)
   (try
     let _ = Grid.s_at grid (-1) in
     Printf.printf "FAIL: Should reject negative index in s_at\n";
@@ -235,7 +214,6 @@ let test_grid_parameter_validation () =
     exit 1
   with Invalid_argument _ -> ());
   
-  (* Test find_bracketing_index with invalid values *)
   (try
     let _ = Grid.find_bracketing_index grid (Float.nan) in
     Printf.printf "FAIL: Should reject NaN in find_bracketing_index\n";

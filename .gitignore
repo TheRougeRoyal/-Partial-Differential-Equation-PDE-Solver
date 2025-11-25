@@ -1,0 +1,40 @@
+# OCaml build artifacts
+_build/
+*.exe
+*.o
+*.so
+*.a
+*.cma
+*.cmxa
+*.cmi
+*.cmo
+*.cmx
+*.cmt
+*.cmti
+*.annot
+*.byte
+*.native
+.merlin-conf/
+*.install
+*.dune-package
+
+# Editor files
+*~
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Data files (optional - uncomment if you want to exclude CSV data)
+# *.csv
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*~

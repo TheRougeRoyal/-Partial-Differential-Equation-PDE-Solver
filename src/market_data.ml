@@ -1,5 +1,3 @@
-(** Market data parsing and analysis from CSV files *)
-
 type data_point = {
   date: string;
   open_price: float;
@@ -15,40 +13,35 @@ type t = {
   data: data_point array;
 }
 
-(* Helper function to clean numeric strings (remove commas) *)
 let clean_numeric str =
   String.map (function ',' -> ' ' | c -> c) str
   |> String.trim
 
-(* Parse a single CSV line into a data point *)
 let parse_line line =
-  (* Split by comma, handling potential spaces *)
   let parts = String.split_on_char ',' line 
               |> List.map String.trim 
               |> Array.of_list in
   
-  if Array.length parts < 7 then
+  if Array.length parts < 9 then
     None
   else
     try
       Some {
-        date = parts.(0);
-        open_price = float_of_string (clean_numeric parts.(1));
-        high = float_of_string (clean_numeric parts.(2));
-        low = float_of_string (clean_numeric parts.(3));
-        close = float_of_string (clean_numeric parts.(4));
-        volume = int_of_string (clean_numeric parts.(5));
-        turnover = float_of_string (clean_numeric parts.(6));
+        date = parts.(3);
+        high = float_of_string (clean_numeric parts.(4));
+        low = float_of_string (clean_numeric parts.(5));
+        open_price = float_of_string (clean_numeric parts.(6));
+        close = float_of_string (clean_numeric parts.(7));
+        volume = int_of_float (float_of_string (clean_numeric parts.(8)));
+        turnover = 0.0;
       }
     with _ -> None
 
-(* Extract symbol name from filename or use default *)
 let extract_symbol filename =
   let basename = Filename.basename filename in
   let without_ext = 
     try Filename.chop_extension basename 
     with Invalid_argument _ -> basename in
-  (* Remove date range suffix if present *)
   match String.split_on_char '-' without_ext with
   | hd :: _ -> String.uppercase_ascii hd
   | [] -> "UNKNOWN"
@@ -61,21 +54,17 @@ let parse_csv filename =
   let lines = ref [] in
   
   try
-    (* Skip header line *)
     let _ = input_line ic in
-    
-    (* Read all data lines *)
     while true do
       let line = input_line ic in
       match parse_line line with
       | Some dp -> lines := dp :: !lines
-      | None -> () (* Skip malformed lines *)
+      | None -> ()
     done;
     close_in ic;
-    { symbol = extract_symbol filename; data = [||] } (* Never reached *)
+    { symbol = extract_symbol filename; data = [||] }
   with End_of_file ->
     close_in ic;
-    (* Data is in reverse chronological order in CSV, so reverse it *)
     let data_array = Array.of_list (List.rev !lines) in
     { symbol = extract_symbol filename; data = data_array }
 
@@ -96,15 +85,12 @@ let realized_volatility ~window_days t =
   if n < window_days then
     invalid_arg (Printf.sprintf "Not enough data points (%d) for window size %d" n window_days);
   
-  (* Use the most recent window_days of returns *)
   let start_idx = max 0 (n - window_days) in
   let windowed_returns = Array.sub returns start_idx (min window_days (n - start_idx)) in
   
-  (* Calculate mean return *)
   let sum = Array.fold_left (+.) 0.0 windowed_returns in
   let mean = sum /. float_of_int (Array.length windowed_returns) in
   
-  (* Calculate variance *)
   let sum_sq_dev = Array.fold_left (fun acc r ->
     let dev = r -. mean in
     acc +. dev *. dev
@@ -113,7 +99,6 @@ let realized_volatility ~window_days t =
   let variance = sum_sq_dev /. float_of_int (Array.length windowed_returns - 1) in
   let daily_vol = Float.sqrt variance in
   
-  (* Annualize: multiply by sqrt(252) for trading days *)
   daily_vol *. Float.sqrt 252.0
 
 let ewma_volatility ~lambda t =
@@ -126,10 +111,8 @@ let ewma_volatility ~lambda t =
   if lambda <= 0.0 || lambda >= 1.0 then
     invalid_arg (Printf.sprintf "Lambda must be in (0,1), got %g" lambda);
   
-  (* Initialize with first return squared *)
   let initial_var = returns.(0) *. returns.(0) in
   
-  (* Calculate EWMA variance *)
   let final_var = ref initial_var in
   for i = 1 to n - 1 do
     let ret_sq = returns.(i) *. returns.(i) in
@@ -137,8 +120,6 @@ let ewma_volatility ~lambda t =
   done;
   
   let daily_vol = Float.sqrt !final_var in
-  
-  (* Annualize *)
   daily_vol *. Float.sqrt 252.0
 
 let average_drift t =
@@ -149,7 +130,6 @@ let average_drift t =
   else
     let sum = Array.fold_left (+.) 0.0 returns in
     let daily_mean = sum /. float_of_int n in
-    (* Annualize: multiply by 252 trading days *)
     daily_mean *. 252.0
 
 let price_statistics t =
@@ -179,7 +159,6 @@ let latest_close t =
   let n = Array.length t.data in
   if n = 0 then
     invalid_arg "No data available";
-  (* Data is in chronological order, so last element is most recent *)
   t.data.(n - 1).close
 
 let date_range t =

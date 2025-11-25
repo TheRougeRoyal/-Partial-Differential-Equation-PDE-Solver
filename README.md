@@ -15,9 +15,26 @@ A sophisticated PDE solver project (OCaml / Dune-based) for pricing financial de
 - **High Accuracy**: Typical errors <0.001 vs analytical Black-Scholes
 - **Production-Ready**: Robust error handling, parameter validation, detailed diagnostics
 
-## New Pricing Model
+## Crypto Price Prediction
 
-We've added a simple, elegant pricing model on top of the PDE solver:
+Elegant crypto forecasting with historical data:
+
+```bash
+dune exec crypto_dashboard
+```
+
+Features:
+- Monte Carlo price forecasting
+- Technical indicators (RSI, MA, Bollinger)
+- Trading signals
+- Option pricing for crypto
+- Backtesting validation
+
+See [CRYPTO_MODEL.md](CRYPTO_MODEL.md) for details.
+
+## Pricing Model
+
+Simple, elegant pricing model on top of the PDE solver:
 
 ```ocaml
 open Pde_opt
@@ -82,16 +99,22 @@ dune clean
 
 ## Run
 
-### Quick Start with Pricing Model
+### Quick Start
 
 ```bash
-# Run simple examples
+# Crypto prediction dashboard
+dune exec crypto_dashboard
+
+# Price forecasting
+dune exec crypto_predict
+
+# Model backtesting
+dune exec crypto_backtest
+
+# Options pricing
 dune exec example_pricing
 
-# Price with market data
-dune exec market_pricing
-
-# Analyze Greeks
+# Greeks analysis
 dune exec greeks_analysis
 ```
 
