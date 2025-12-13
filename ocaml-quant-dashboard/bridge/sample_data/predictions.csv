@@ -1,0 +1,11 @@
+timestamp,asset,model,predicted_price,confidence,horizon_seconds
+2024-01-01 10:00:00,Bitcoin,monte_carlo,42500.00,0.85,3600
+2024-01-02 10:00:00,Bitcoin,monte_carlo,42750.00,0.87,3600
+2024-01-03 10:00:00,Bitcoin,monte_carlo,43000.00,0.82,3600
+2024-01-04 10:00:00,Bitcoin,monte_carlo,43250.00,0.89,3600
+2024-01-05 10:00:00,Bitcoin,monte_carlo,43500.00,0.84,3600
+2024-01-01 10:00:00,Ethereum,monte_carlo,2250.00,0.83,3600
+2024-01-02 10:00:00,Ethereum,monte_carlo,2270.00,0.86,3600
+2024-01-03 10:00:00,Ethereum,monte_carlo,2290.00,0.81,3600
+2024-01-04 10:00:00,Ethereum,monte_carlo,2310.00,0.88,3600
+2024-01-05 10:00:00,Ethereum,monte_carlo,2330.00,0.85,3600
