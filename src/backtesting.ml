@@ -42,6 +42,7 @@ let run_backtest market_data params strike payoff time_to_maturity scheme =
         0.0
     in
     
+
     {
       date = dp.Market_data.date;
       actual_price;
