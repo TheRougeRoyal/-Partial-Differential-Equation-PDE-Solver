@@ -1,0 +1,13 @@
+{
+  "name": "pde-solver",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix ocaml-quant-dashboard/frontend",
+    "build": "npm run build --prefix ocaml-quant-dashboard/frontend",
+    "preview": "npm run preview --prefix ocaml-quant-dashboard/frontend",
+    "bridge": "npm run dev --prefix ocaml-quant-dashboard/bridge",
+    "install:frontend": "npm install --legacy-peer-deps --prefix ocaml-quant-dashboard/frontend",
+    "install:bridge": "npm install --prefix ocaml-quant-dashboard/bridge"
+  }
+}

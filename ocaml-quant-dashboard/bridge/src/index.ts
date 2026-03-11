@@ -5,6 +5,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
 import path from 'path';
 import crypto from 'crypto';
+import { execFile } from 'child_process';
 
 // Generate UUID using built-in crypto
 const uuidv4 = () => crypto.randomUUID();
@@ -28,6 +29,7 @@ import { ApiResponse, LiveUpdate, QueryParams } from './types';
 // Configuration
 const PORT = process.env.PORT || 3001;
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../sample_data');
+const OCAML_BIN_DIR = process.env.OCAML_BIN_DIR || path.resolve(__dirname, '../../../_build/default/bin');
 
 // Set data directory
 setDataDirectory(DATA_DIR);
@@ -461,6 +463,65 @@ app.post('/api/v1/cache/clear', (req: Request, res: Response) => {
   }
 });
 
+// POST /api/v1/pricing - Solve PDE using OCaml backend
+app.post('/api/v1/pricing', (req: Request, res: Response) => {
+  const { spot, strike, maturity, rate, volatility, optionType, scheme } = req.body;
+
+  if (!spot || !strike || !maturity || rate === undefined || !volatility || !optionType) {
+    res.status(400).json({
+      success: false,
+      error: 'Missing required fields: spot, strike, maturity, rate, volatility, optionType',
+    });
+    return;
+  }
+
+  // Map scheme names from frontend to OCaml
+  const schemeMap: Record<string, string> = {
+    'crank-nicolson': 'CN',
+    'backward-euler': 'BE',
+    'CN': 'CN',
+    'BE': 'BE',
+  };
+
+  const input = JSON.stringify({
+    spot: Number(spot),
+    strike: Number(strike),
+    maturity: Number(maturity),
+    rate: Number(rate),
+    volatility: Number(volatility),
+    optionType: optionType,
+    scheme: schemeMap[scheme] || 'CN',
+  });
+
+  const binaryPath = path.join(OCAML_BIN_DIR, 'pricing_api.exe');
+
+  const child = execFile(binaryPath, [], { timeout: 10000 }, (error, stdout, stderr) => {
+    if (error) {
+      console.error('OCaml pricing error:', error.message, stderr);
+      res.status(500).json({
+        success: false,
+        error: `PDE solver error: ${error.message}`,
+      });
+      return;
+    }
+
+    try {
+      const result = JSON.parse(stdout.trim());
+      res.json(result);
+    } catch (parseError) {
+      console.error('Failed to parse OCaml output:', stdout);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to parse PDE solver output',
+      });
+    }
+  });
+
+  // Send input via stdin
+  child.stdin?.write(input);
+  child.stdin?.end();
+});
+
 // Health check endpoint
 app.get('/api/v1/health', (req: Request, res: Response) => {
   res.json({
@@ -495,6 +556,7 @@ server.listen(PORT, () => {
   console.log('  GET  /api/v1/filters');
   console.log('  GET  /api/v1/metrics');
   console.log('  GET  /api/v1/prediction-accuracy');
+  console.log('  POST /api/v1/pricing          ← OCaml PDE solver');
   console.log('  POST /api/v1/upload');
   console.log('  GET  /api/v1/uploads');
   console.log('  GET  /api/v1/uploads/:id');
