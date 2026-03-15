@@ -3,11 +3,22 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm run dev --prefix ocaml-quant-dashboard/frontend",
-    "build": "npm run build --prefix ocaml-quant-dashboard/frontend",
+    "dev": "concurrently -n bridge,frontend -c blue,green \"npm run dev:bridge\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm run dev --prefix ocaml-quant-dashboard/frontend",
+    "dev:bridge": "PORT=3002 npm run dev --prefix ocaml-quant-dashboard/bridge",
+    "build": "npm run build:frontend",
+    "build:frontend": "npm run build --prefix ocaml-quant-dashboard/frontend",
+    "build:bridge": "npm run build --prefix ocaml-quant-dashboard/bridge",
+    "lint": "npm run lint --prefix ocaml-quant-dashboard/bridge && npm run lint --prefix ocaml-quant-dashboard/frontend",
+    "check": "dune build && npm run lint && npm run build:bridge && npm run build:frontend",
+    "deploy:check": "npm run check",
     "preview": "npm run preview --prefix ocaml-quant-dashboard/frontend",
-    "bridge": "npm run dev --prefix ocaml-quant-dashboard/bridge",
+    "bridge": "npm run dev:bridge",
+    "postinstall": "npm run install:frontend && npm run install:bridge",
     "install:frontend": "npm install --legacy-peer-deps --prefix ocaml-quant-dashboard/frontend",
     "install:bridge": "npm install --prefix ocaml-quant-dashboard/bridge"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }

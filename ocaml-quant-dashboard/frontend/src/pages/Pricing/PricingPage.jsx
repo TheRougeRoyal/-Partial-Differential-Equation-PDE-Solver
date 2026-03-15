@@ -55,7 +55,7 @@ const blackScholes = (S, K, T, r, sigma, optionType) => {
 };
 
 // Simulated PDE solver - calls OCaml backend first, falls back to client-side
-const BRIDGE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const BRIDGE_URL = import.meta.env.VITE_API_URL || '';
 
 const solvePDE = async (S, K, T, r, sigma, optionType, scheme) => {
   // Try the real OCaml PDE solver via bridge server

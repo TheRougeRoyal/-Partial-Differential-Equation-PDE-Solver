@@ -28,8 +28,8 @@ import { ApiResponse, LiveUpdate, QueryParams } from './types';
 
 // Configuration
 const PORT = process.env.PORT || 3001;
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../sample_data');
-const OCAML_BIN_DIR = process.env.OCAML_BIN_DIR || path.resolve(__dirname, '../../../_build/default/bin');
+const DATA_DIR = process.env.DATA_DIR || path.resolve(__dirname, '../../sample_data');
+const OCAML_BIN_DIR = process.env.OCAML_BIN_DIR || path.resolve(__dirname, '../../../../_build/default/bin');
 
 // Set data directory
 setDataDirectory(DATA_DIR);

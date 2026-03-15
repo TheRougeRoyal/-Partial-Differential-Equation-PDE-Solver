@@ -30,7 +30,7 @@ _build/
 Thumbs.db
 
 # Data files (optional - uncomment if you want to exclude CSV data)
-# *.csv
+*.csv
 
 # Logs
 *.log

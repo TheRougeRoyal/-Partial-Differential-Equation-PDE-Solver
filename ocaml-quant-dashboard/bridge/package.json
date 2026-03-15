@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "lint": "tsc --noEmit",
+    "check": "npm run lint && npm run build",
+    "start": "PORT=${PORT:-3002} node dist/index.js",
     "test": "jest",
     "simulate": "node simulate_live.js"
   },
