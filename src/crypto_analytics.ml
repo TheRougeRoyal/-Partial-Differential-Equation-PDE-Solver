@@ -30,6 +30,7 @@ let rsi data period =
     let avg_gain = ref 0.0 in
     let avg_loss = ref 0.0 in
     
+     
     for i = 0 to period - 1 do
       avg_gain := !avg_gain +. gains.(i);
       avg_loss := !avg_loss +. losses.(i)

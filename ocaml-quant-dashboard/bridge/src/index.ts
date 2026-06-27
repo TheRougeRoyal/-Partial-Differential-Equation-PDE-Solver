@@ -467,7 +467,7 @@ app.post('/api/v1/cache/clear', (req: Request, res: Response) => {
 app.post('/api/v1/pricing', (req: Request, res: Response) => {
   const { spot, strike, maturity, rate, volatility, optionType, scheme } = req.body;
 
-  if (!spot || !strike || !maturity || rate === undefined || !volatility || !optionType) {
+  if (spot === undefined || strike === undefined || maturity === undefined || rate === undefined || volatility === undefined || !optionType) {
     res.status(400).json({
       success: false,
       error: 'Missing required fields: spot, strike, maturity, rate, volatility, optionType',
@@ -475,7 +475,36 @@ app.post('/api/v1/pricing', (req: Request, res: Response) => {
     return;
   }
 
-  // Map scheme names from frontend to OCaml
+  const numSpot = Number(spot);
+  const numStrike = Number(strike);
+  const numMaturity = Number(maturity);
+  const numRate = Number(rate);
+  const numVol = Number(volatility);
+
+  if ([numSpot, numStrike, numMaturity, numRate, numVol].some(isNaN)) {
+    res.status(400).json({
+      success: false,
+      error: 'All numeric fields must be valid numbers',
+    });
+    return;
+  }
+
+  if (numSpot <= 0 || numStrike <= 0 || numMaturity <= 0 || numVol <= 0) {
+    res.status(400).json({
+      success: false,
+      error: 'spot, strike, maturity, and volatility must be positive',
+    });
+    return;
+  }
+
+  if (!['call', 'put'].includes(optionType)) {
+    res.status(400).json({
+      success: false,
+      error: 'optionType must be "call" or "put"',
+    });
+    return;
+  }
+
   const schemeMap: Record<string, string> = {
     'crank-nicolson': 'CN',
     'backward-euler': 'BE',
@@ -484,24 +513,26 @@ app.post('/api/v1/pricing', (req: Request, res: Response) => {
   };
 
   const input = JSON.stringify({
-    spot: Number(spot),
-    strike: Number(strike),
-    maturity: Number(maturity),
-    rate: Number(rate),
-    volatility: Number(volatility),
+    spot: numSpot,
+    strike: numStrike,
+    maturity: numMaturity,
+    rate: numRate,
+    volatility: numVol,
     optionType: optionType,
     scheme: schemeMap[scheme] || 'CN',
   });
 
   const binaryPath = path.join(OCAML_BIN_DIR, 'pricing_api.exe');
 
-  const child = execFile(binaryPath, [], { timeout: 10000 }, (error, stdout, stderr) => {
+  const child = execFile(binaryPath, [], { timeout: 15000 }, (error, stdout, stderr) => {
     if (error) {
       console.error('OCaml pricing error:', error.message, stderr);
-      res.status(500).json({
-        success: false,
-        error: `PDE solver error: ${error.message}`,
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          error: `PDE solver error: ${error.message}`,
+        });
+      }
       return;
     }
 
@@ -510,14 +541,25 @@ app.post('/api/v1/pricing', (req: Request, res: Response) => {
       res.json(result);
     } catch (parseError) {
       console.error('Failed to parse OCaml output:', stdout);
+      if (!res.headersSent) {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to parse PDE solver output',
+        });
+      }
+    }
+  });
+
+  child.on('error', (err) => {
+    console.error('Failed to spawn OCaml process:', err.message);
+    if (!res.headersSent) {
       res.status(500).json({
         success: false,
-        error: 'Failed to parse PDE solver output',
+        error: 'PDE solver binary not found or failed to start',
       });
     }
   });
 
-  // Send input via stdin
   child.stdin?.write(input);
   child.stdin?.end();
 });

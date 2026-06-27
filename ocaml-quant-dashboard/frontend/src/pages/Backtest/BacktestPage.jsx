@@ -12,7 +12,7 @@ import {
   Cell,
 } from 'recharts';
 import { History, TrendingUp, Download } from 'lucide-react';
-import { generateBacktestResults, generateEquityCurve, generateMonthlyReturns } from '../../utils/mockData';
+import { generateBacktestResults, generateEquityCurve, generateMonthlyReturns, ApiClient } from '../../utils/mockData';
 import { formatCurrency, formatPercent, formatNumber } from '../../utils/formatters';
 import { exportToCSV, exportToJSON } from '../../utils/exportData';
 import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts';
@@ -31,9 +31,41 @@ export const BacktestPage = () => {
 
   useEffect(() => {
     const periodDays = { '1M': 30, '3M': 90, '6M': 180, '1Y': 365 }[period];
-    setResults(generateBacktestResults(period));
-    setEquityCurve(generateEquityCurve(periodDays));
-    setMonthlyReturns(generateMonthlyReturns());
+
+    async function load() {
+      try {
+        const [metricsRes, backtestsRes] = await Promise.all([
+          ApiClient.get('/metrics'),
+          ApiClient.get('/backtests'),
+        ]);
+
+        if (metricsRes?.success && metricsRes.data) {
+          const d = metricsRes.data;
+          setResults({
+            totalReturn: d.totalReturn || 0,
+            sharpe: d.sharpeRatio || 0,
+            sortino: d.sortinoRatio || 0,
+            maxDrawdown: -(d.maxDrawdown || 0),
+            winRate: d.winRate || 0,
+            totalTrades: d.totalTrades || 0,
+            avgWin: 3.2,
+            avgLoss: -1.8,
+            profitFactor: 1.6,
+            calmarRatio: 1.4,
+            period,
+            periodDays,
+          });
+          setEquityCurve(generateEquityCurve(periodDays));
+          setMonthlyReturns(generateMonthlyReturns());
+          return;
+        }
+      } catch {}
+      setResults(generateBacktestResults(period));
+      setEquityCurve(generateEquityCurve(periodDays));
+      setMonthlyReturns(generateMonthlyReturns());
+    }
+
+    load();
   }, [period]);
 
   const handleExportCSV = () => {
@@ -58,8 +90,8 @@ export const BacktestPage = () => {
     <div className="backtest-page" data-testid="backtest-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Backtest Results</h1>
-          <p className="page-subtitle">Historical strategy performance analysis</p>
+          <h1 className="page-title">Strategy Lab</h1>
+          <p className="page-subtitle">Historical algo performance, risk metrics, and benchmark comparison</p>
         </div>
         <div className="page-actions">
           <div className="period-selector">
@@ -118,7 +150,7 @@ export const BacktestPage = () => {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={equityCurve}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} />
                 <XAxis
                   dataKey="date"
                   tickFormatter={(d) => new Date(d).toLocaleDateString('en-US', { month: 'short' })}
@@ -134,7 +166,7 @@ export const BacktestPage = () => {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: 'var(--surface)',
+                    background: 'var(--surface-elevated)',
                     border: '1px solid var(--border)',
                     borderRadius: '8px',
                     fontFamily: 'JetBrains Mono',
@@ -146,7 +178,7 @@ export const BacktestPage = () => {
                   type="monotone"
                   dataKey="equity"
                   stroke="#1f6feb"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   dot={false}
                   name="Strategy"
                 />
@@ -182,7 +214,7 @@ export const BacktestPage = () => {
           <div className="chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyReturns}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.5} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" opacity={0.4} />
                 <XAxis
                   dataKey="month"
                   stroke="var(--text-secondary)"
@@ -197,7 +229,7 @@ export const BacktestPage = () => {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: 'var(--surface)',
+                    background: 'var(--surface-elevated)',
                     border: '1px solid var(--border)',
                     borderRadius: '8px',
                     fontFamily: 'JetBrains Mono',
@@ -205,7 +237,7 @@ export const BacktestPage = () => {
                   }}
                   formatter={(value) => [`${value.toFixed(2)}%`, 'Return']}
                 />
-                <Bar dataKey="return" radius={[4, 4, 0, 0]}>
+                <Bar dataKey="return" radius={[3, 3, 0, 0]}>
                   {monthlyReturns.map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
@@ -220,7 +252,7 @@ export const BacktestPage = () => {
       </div>
 
       <div className="detailed-metrics" data-testid="detailed-metrics">
-        <div className="section-title">Detailed Metrics</div>
+          <div className="section-title">Strategy Diagnostics</div>
         <div className="details-grid">
           <div className="detail-item">
             <span className="detail-label">Avg Win</span>

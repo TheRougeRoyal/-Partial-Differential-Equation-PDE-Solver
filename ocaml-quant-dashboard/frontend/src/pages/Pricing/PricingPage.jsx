@@ -58,7 +58,6 @@ const blackScholes = (S, K, T, r, sigma, optionType) => {
 const BRIDGE_URL = import.meta.env.VITE_API_URL || '';
 
 const solvePDE = async (S, K, T, r, sigma, optionType, scheme) => {
-  // Try the real OCaml PDE solver via bridge server
   try {
     const response = await fetch(`${BRIDGE_URL}/api/v1/pricing`, {
       method: 'POST',
@@ -76,15 +75,12 @@ const solvePDE = async (S, K, T, r, sigma, optionType, scheme) => {
 
     if (response.ok) {
       const result = await response.json();
-      if (result.success) {
-        return result;
+      if (result.success !== false) {
+        return { ...result, source: 'ocaml' };
       }
     }
-    throw new Error('Backend unavailable');
+    throw new Error('Backend returned error');
   } catch (error) {
-    console.log('OCaml backend unavailable, using client-side Black-Scholes:', error.message);
-    
-    // Fallback: client-side Black-Scholes with simulated PDE noise
     const analytic = blackScholes(S, K, T, r, sigma, optionType);
     const errorFactor = scheme === 'crank-nicolson' ? 0.001 : 0.003;
     const pdePriceError = analytic.price * errorFactor * (Math.random() - 0.5);
@@ -94,6 +90,7 @@ const solvePDE = async (S, K, T, r, sigma, optionType, scheme) => {
       analyticPrice: analytic.price,
       error: Math.abs(pdePriceError / analytic.price * 100),
       greeks: analytic,
+      source: 'browser',
     };
   }
 };
@@ -139,7 +136,11 @@ export const PricingPage = () => {
         inputs.scheme
       );
       setResults(result);
-      toast.success('PDE solved successfully');
+      if (result.source === 'ocaml') {
+        toast.success('Priced via OCaml PDE solver');
+      } else {
+        toast('Priced via client-side Black-Scholes', { icon: '⚡' });
+      }
     } catch (error) {
       toast.error('Calculation failed');
     } finally {
@@ -156,8 +157,8 @@ export const PricingPage = () => {
     <div className="pricing-page" data-testid="pricing-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Option Pricer</h1>
-          <p className="page-subtitle">Black-Scholes / PDE numerical pricing engine</p>
+          <h1 className="page-title">Pricing Engine</h1>
+          <p className="page-subtitle">Derivatives valuation, Greeks, and execution-grade theoretical pricing</p>
         </div>
       </div>
 
@@ -165,7 +166,7 @@ export const PricingPage = () => {
         <div className="input-panel">
           <div className="panel-title">
             <Calculator size={16} />
-            Input Parameters
+            Trade Parameters
           </div>
           <div className="input-form">
             <div className="input-row">
@@ -257,7 +258,7 @@ export const PricingPage = () => {
             </div>
 
             <div className="input-group">
-              <label className="input-label">Numerical Scheme</label>
+              <label className="input-label">Pricing Scheme</label>
               <div className="radio-group">
                 <label className="radio-option">
                   <input
@@ -290,15 +291,15 @@ export const PricingPage = () => {
               disabled={loading}
               data-testid="calculate-btn"
             >
-              {loading ? 'Solving PDE...' : 'Calculate Price'}
+              {loading ? 'Calculating...' : 'Price Trade'}
             </button>
           </div>
         </div>
 
         <div className="results-panel">
           <div className="results-header">
-            <div className="panel-title" style={{ marginBottom: 0 }}>
-              Pricing Results
+            <div className="panel-title" style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+              Pricing Output
             </div>
             {loading && (
               <div className="loading-indicator">
@@ -310,28 +311,33 @@ export const PricingPage = () => {
 
           {results ? (
             <>
+              {results.source && (
+                <div className="source-badge" data-testid="computation-source">
+                  {results.source === 'ocaml' ? 'PDE Solver (OCaml)' : 'Black-Scholes (Browser)'}
+                </div>
+              )}
               <div className="price-results">
                 <div className="price-card">
-                  <div className="price-label">PDE Price</div>
+                  <div className="price-label">Algo Fair Value</div>
                   <div className="price-value accent" data-testid="result-pde-price">
                     {formatCurrency(results.pdePrice)}
                   </div>
                 </div>
                 <div className="price-card">
-                  <div className="price-label">Analytic Price</div>
+                  <div className="price-label">Benchmark Value</div>
                   <div className="price-value" data-testid="result-analytic-price">
                     {formatCurrency(results.analyticPrice)}
                   </div>
                 </div>
                 <div className="price-card">
-                  <div className="price-label">Numerical Error</div>
+                  <div className="price-label">Model Variance</div>
                   <div className="price-value success" data-testid="result-error">
                     {results.error.toFixed(4)}%
                   </div>
                 </div>
               </div>
 
-              <div className="panel-title">Greeks</div>
+              <div className="panel-title">Risk Greeks</div>
               <div className="greeks-results">
                 {GREEKS_CONFIG.map((greek) => (
                   <div className="greek-card" key={greek.key} data-testid={`greek-${greek.key}`}>
@@ -348,7 +354,7 @@ export const PricingPage = () => {
             <div className="no-results">
               <Calculator className="no-results-icon" size={48} />
               <div className="no-results-text">
-                Enter parameters and click Calculate<br />to price your option
+                Enter trade parameters and price<br />the selected option
               </div>
             </div>
           )}

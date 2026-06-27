@@ -7,33 +7,68 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { toast } from 'sonner';
 import './LivePage.css';
 
+const WS_URL = import.meta.env.VITE_WS_URL || `ws://${window.location.hostname}:3001/ws/live`;
+
 export const LivePage = () => {
   const [tickers, setTickers] = useState([]);
   const [selectedPair, setSelectedPair] = useState('BTC-USD');
   const [orderBook, setOrderBook] = useState({ asks: [], bids: [], spread: 0 });
   const [trades, setTrades] = useState([]);
-  const [connected, setConnected] = useState(true);
+  const [connected, setConnected] = useState(false);
   const [flashStates, setFlashStates] = useState({});
   const [tradeForm, setTradeForm] = useState({
     amount: '',
     priceType: 'market',
   });
   const prevPrices = useRef({});
+  const wsRef = useRef(null);
   const { toggleTheme } = useTheme();
+
+  const connectWebSocket = useCallback(() => {
+    try {
+      const ws = new WebSocket(WS_URL);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setConnected(true);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'price_update' && data.asset && data.price) {
+            setTickers(prev => {
+              const updated = prev.map(t =>
+                t.asset === data.asset ? { ...t, price: data.price, change: data.change || t.change } : t
+              );
+              return updated.length > 0 ? updated : generateTickerData();
+            });
+          }
+        } catch {}
+      };
+
+      ws.onclose = () => {
+        setConnected(false);
+        setTimeout(connectWebSocket, 3000);
+      };
+
+      ws.onerror = () => {
+        setConnected(false);
+        ws.close();
+      };
+    } catch {
+      setConnected(false);
+    }
+  }, []);
 
   const updateData = useCallback(() => {
     const newTickers = generateTickerData();
-    
-    // Check for price changes and set flash states
     const newFlashStates = {};
     newTickers.forEach(ticker => {
       const prevPrice = prevPrices.current[ticker.asset];
       if (prevPrice) {
-        if (ticker.price > prevPrice) {
-          newFlashStates[ticker.asset] = 'up';
-        } else if (ticker.price < prevPrice) {
-          newFlashStates[ticker.asset] = 'down';
-        }
+        if (ticker.price > prevPrice) newFlashStates[ticker.asset] = 'up';
+        else if (ticker.price < prevPrice) newFlashStates[ticker.asset] = 'down';
       }
       prevPrices.current[ticker.asset] = ticker.price;
     });
@@ -50,32 +85,26 @@ export const LivePage = () => {
   }, []);
 
   useEffect(() => {
-    // Initial load
     setTickers(generateTickerData());
     setOrderBook(generateOrderBook());
     setTrades(generateRecentTrades(20));
 
-    // Simulated WebSocket updates every 2 seconds
-    const interval = setInterval(updateData, 2000);
+    connectWebSocket();
 
-    // Simulate connection status
-    const connectionCheck = setInterval(() => {
-      setConnected(Math.random() > 0.05);
-    }, 10000);
+    const interval = setInterval(updateData, 2000);
 
     return () => {
       clearInterval(interval);
-      clearInterval(connectionCheck);
+      if (wsRef.current) wsRef.current.close();
     };
-  }, [updateData]);
+  }, [updateData, connectWebSocket]);
 
   const handleTrade = (side) => {
     if (!tradeForm.amount) {
       toast.error('Please enter an amount');
       return;
     }
-
-    toast.success(`${side.toUpperCase()} order placed for ${tradeForm.amount} ${selectedPair}`);
+    toast.success(`${side.toUpperCase()} order routed for ${tradeForm.amount} ${selectedPair}`);
     setTradeForm({ amount: '', priceType: 'market' });
   };
 
@@ -91,8 +120,8 @@ export const LivePage = () => {
     <div className="live-page" data-testid="live-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Live Trading</h1>
-          <p className="page-subtitle">Real-time market data and execution</p>
+          <h1 className="page-title">Trading Desk</h1>
+          <p className="page-subtitle">Real-time market data, depth, tape, and one-click execution</p>
         </div>
         <div className="page-actions">
           <div className="connection-indicator" data-testid="connection-indicator">
@@ -141,7 +170,7 @@ export const LivePage = () => {
         <div className="trading-panel" data-testid="order-book">
           <div className="panel-header">
             <BookOpen size={14} />
-            Order Book
+            Market Depth
           </div>
           <div className="panel-content">
             {orderBook.asks.map((ask, index) => (
@@ -185,7 +214,7 @@ export const LivePage = () => {
         <div className="trading-panel" data-testid="quick-trade">
           <div className="panel-header">
             <Zap size={14} />
-            Quick Trade - {selectedPair}
+            Quick Trade — {selectedPair}
           </div>
           <div className="quick-trade">
             <div className="quick-trade-row">
@@ -222,7 +251,7 @@ export const LivePage = () => {
 
             {selectedTicker && (
               <div className="quick-trade-row">
-                <label className="quick-trade-label">Current Price</label>
+                <label className="quick-trade-label">Market Price</label>
                 <div className="quick-trade-input" style={{ cursor: 'default' }}>
                   {formatCurrency(selectedTicker.price)}
                 </div>

@@ -96,10 +96,10 @@ export const generatePositions = () => {
 };
 
 export const generateAllocation = () => [
-  { name: 'BTC', value: randomBetween(35, 45), color: '#f7931a' },
-  { name: 'ETH', value: randomBetween(20, 30), color: '#627eea' },
-  { name: 'SOL', value: randomBetween(10, 20), color: '#00ffa3' },
-  { name: 'Options', value: randomBetween(5, 15), color: '#1f6feb' },
+  { name: 'Momentum', value: randomBetween(35, 45), color: '#f7931a' },
+  { name: 'Mean Reversion', value: randomBetween(20, 30), color: '#627eea' },
+  { name: 'Breakout', value: randomBetween(10, 20), color: '#00ffa3' },
+  { name: 'Volatility', value: randomBetween(5, 15), color: '#1f6feb' },
   { name: 'Cash', value: randomBetween(5, 15), color: '#8b949e' },
 ];
 
@@ -140,18 +140,18 @@ export const generateOptionsChain = (asset) => {
 export const generateSignals = (count = 20) => {
   const signals = [];
   const actions = ['buy', 'sell', 'hold'];
-  const models = ['LSTM-V3', 'XGBoost', 'RandomForest', 'GRU-Ensemble', 'Transformer'];
+  const models = ['Momentum-V3', 'XGBoost-Alpha', 'Risk Overlay', 'GRU-Execution', 'Transformer-Alpha'];
   const reasons = [
     'RSI oversold + MACD crossover',
-    'Breakout above resistance level',
-    'Volume surge detected',
-    'Bullish divergence on momentum',
-    'Support level test - reversal likely',
-    'Bearish engulfing pattern',
-    'Moving average death cross',
-    'High volatility - risk reduction',
-    'Consolidation - awaiting breakout',
-    'Mean reversion opportunity',
+    'Breakout above resistance with rising volume',
+    'Liquidity sweep detected near top of book',
+    'Momentum divergence supports long bias',
+    'Support retest with favorable reward/risk',
+    'Bearish reversal pattern triggered',
+    'Moving average cross confirms sell bias',
+    'Volatility spike triggered risk reduction',
+    'Range compression awaiting breakout',
+    'Mean reversion setup inside value area',
   ];
 
   for (let i = 0; i < count; i++) {

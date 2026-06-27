@@ -48,7 +48,7 @@ export const OrdersPage = () => {
     setOrders(prev => [newOrder, ...prev]);
     setShowModal(false);
     setFormData({ asset: 'BTC-USD', side: 'buy', type: 'limit', qty: '', price: '' });
-    toast.success('Order submitted successfully');
+    toast.success('Order routed successfully');
   };
 
   const handleCancel = (orderId) => {
@@ -87,57 +87,74 @@ export const OrdersPage = () => {
 
   return (
     <div className="orders-page" data-testid="orders-page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Orders</h1>
-          <p className="page-subtitle">Order management and history</p>
+      {/* ── Header ── */}
+      <div className="orders-page-header">
+        <div className="orders-title-group">
+          <div className="orders-icon-wrap">
+            <FileText size={18} className="orders-book-icon" />
+          </div>
+          <div>
+          <h1 className="orders-page-title">Execution Blotter</h1>
+            <p className="orders-page-subtitle">Broker-routed orders, fills, cancels, and execution history</p>
+          </div>
         </div>
-        <div className="page-actions">
-          <button className="asset-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
-            <Download size={14} /> CSV
+        <div className="orders-header-actions">
+          <button className="orders-export-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
+            <Download size={13} />
+            <span>CSV</span>
           </button>
           <button
-            className="new-order-btn"
+            className="orders-new-btn"
             onClick={() => setShowModal(true)}
             data-testid="new-order-btn"
           >
-            <Plus size={16} />
-            New Order
+            <Plus size={15} />
+            <span>Route Order</span>
           </button>
         </div>
       </div>
 
-      <div className="orders-table-container" data-testid="orders-table">
+      {/* ── Orders Table ── */}
+      <div className="orders-table-wrap" data-testid="orders-table">
         {orders.length > 0 ? (
-          <div className="orders-table">
-            <div className="orders-header">
-              <div className="orders-header-cell">Time</div>
-              <div className="orders-header-cell">Asset</div>
-              <div className="orders-header-cell center">Side</div>
-              <div className="orders-header-cell">Type</div>
-              <div className="orders-header-cell right">Qty</div>
-              <div className="orders-header-cell right">Price</div>
-              <div className="orders-header-cell center">Status</div>
-              <div className="orders-header-cell center">Action</div>
+          <div className="orders-tbl">
+            <div className="orders-tbl-head">
+              <div className="orders-th">Time</div>
+              <div className="orders-th">Asset</div>
+              <div className="orders-th th-center">Side</div>
+              <div className="orders-th">Type</div>
+              <div className="orders-th th-right">Qty</div>
+              <div className="orders-th th-right">Price</div>
+              <div className="orders-th th-center">Status</div>
+              <div className="orders-th th-center">Action</div>
             </div>
             {orders.map((order, index) => (
-              <div className="orders-row" key={order.id} data-testid={`order-row-${index}`}>
-                <div className="orders-cell secondary">{formatDateTime(order.timestamp)}</div>
-                <div className="orders-cell">{order.asset}</div>
-                <div className="orders-cell center">
-                  <span className={`side-badge ${order.side}`}>{order.side}</span>
+              <div
+                className={`orders-tbl-row`}
+                key={order.id}
+                data-testid={`order-row-${index}`}
+                style={{ animationDelay: `${Math.min(index * 0.03, 0.6)}s` }}
+              >
+                <div className={`orders-row-indicator indicator-${order.side}`} />
+                <div className="orders-td td-dim">{formatDateTime(order.timestamp)}</div>
+                <div className="orders-td td-asset">{order.asset}</div>
+                <div className="orders-td td-center">
+                  <span className={`orders-side-badge side-${order.side}`}>{order.side}</span>
                 </div>
-                <div className="orders-cell secondary">{order.type}</div>
-                <div className="orders-cell right">{formatNumber(order.qty, 4)}</div>
-                <div className="orders-cell right">
+                <div className="orders-td td-dim td-type">{order.type}</div>
+                <div className="orders-td td-right">{formatNumber(order.qty, 4)}</div>
+                <div className="orders-td td-right">
                   {order.price ? formatCurrency(order.price) : 'Market'}
                 </div>
-                <div className="orders-cell center">
-                  <span className={`status-badge ${order.status}`}>{order.status}</span>
+                <div className="orders-td td-center">
+                  <span className={`orders-status-badge status-${order.status}`}>
+                    {order.status === 'pending' && <span className="status-pulse" />}
+                    {order.status}
+                  </span>
                 </div>
-                <div className="orders-cell center">
+                <div className="orders-td td-center">
                   <button
-                    className="cancel-btn"
+                    className="orders-cancel-btn"
                     onClick={() => handleCancel(order.id)}
                     disabled={order.status !== 'pending'}
                     data-testid={`cancel-btn-${index}`}
@@ -149,27 +166,28 @@ export const OrdersPage = () => {
             ))}
           </div>
         ) : (
-          <div className="empty-state">
-            <FileText className="empty-icon" size={48} />
-            <p className="empty-text">No orders yet. Click "New Order" to create one.</p>
+          <div className="orders-empty">
+            <FileText className="orders-empty-icon" size={48} />
+            <p className="orders-empty-text">No routed orders yet. Use Route Order to create one.</p>
           </div>
         )}
       </div>
 
+      {/* ── New Order Modal ── */}
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)} data-testid="order-modal">
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3 className="modal-title">New Order</h3>
-              <button className="modal-close" onClick={() => setShowModal(false)} data-testid="close-modal-btn">
+        <div className="orders-modal-overlay" onClick={() => setShowModal(false)} data-testid="order-modal">
+          <div className="orders-modal-glass" onClick={(e) => e.stopPropagation()}>
+            <div className="orders-modal-head">
+              <h3 className="orders-modal-title">ROUTE ORDER</h3>
+              <button className="orders-modal-close" onClick={() => setShowModal(false)} data-testid="close-modal-btn">
                 <X size={16} />
               </button>
             </div>
-            <form className="order-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label">Asset</label>
+            <form className="orders-form" onSubmit={handleSubmit}>
+              <div className="orders-form-group">
+                <label className="orders-form-label">Asset</label>
                 <select
-                  className="form-select"
+                  className="orders-form-select"
                   value={formData.asset}
                   onChange={(e) => handleInputChange('asset', e.target.value)}
                   data-testid="form-asset"
@@ -180,12 +198,12 @@ export const OrdersPage = () => {
                 </select>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Side</label>
-                <div className="side-buttons">
+              <div className="orders-form-group">
+                <label className="orders-form-label">Side</label>
+                <div className="orders-side-btns">
                   <button
                     type="button"
-                    className={`side-btn buy ${formData.side === 'buy' ? 'active' : ''}`}
+                    className={`orders-side-btn side-buy-btn ${formData.side === 'buy' ? 'active' : ''}`}
                     onClick={() => handleInputChange('side', 'buy')}
                     data-testid="form-side-buy"
                   >
@@ -193,7 +211,7 @@ export const OrdersPage = () => {
                   </button>
                   <button
                     type="button"
-                    className={`side-btn sell ${formData.side === 'sell' ? 'active' : ''}`}
+                    className={`orders-side-btn side-sell-btn ${formData.side === 'sell' ? 'active' : ''}`}
                     onClick={() => handleInputChange('side', 'sell')}
                     data-testid="form-side-sell"
                   >
@@ -202,11 +220,11 @@ export const OrdersPage = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Order Type</label>
+              <div className="orders-form-row">
+                <div className="orders-form-group">
+                  <label className="orders-form-label">Order Type</label>
                   <select
-                    className="form-select"
+                    className="orders-form-select"
                     value={formData.type}
                     onChange={(e) => handleInputChange('type', e.target.value)}
                     data-testid="form-type"
@@ -216,12 +234,12 @@ export const OrdersPage = () => {
                     ))}
                   </select>
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Quantity</label>
+                <div className="orders-form-group">
+                  <label className="orders-form-label">Quantity</label>
                   <input
                     type="number"
                     step="0.0001"
-                    className="form-input"
+                    className="orders-form-input"
                     value={formData.qty}
                     onChange={(e) => handleInputChange('qty', e.target.value)}
                     placeholder="0.0000"
@@ -232,12 +250,12 @@ export const OrdersPage = () => {
               </div>
 
               {formData.type !== 'market' && (
-                <div className="form-group">
-                  <label className="form-label">Price ($)</label>
+                <div className="orders-form-group">
+                  <label className="orders-form-label">Price ($)</label>
                   <input
                     type="number"
                     step="0.01"
-                    className="form-input"
+                    className="orders-form-input"
                     value={formData.price}
                     onChange={(e) => handleInputChange('price', e.target.value)}
                     placeholder="0.00"
@@ -247,8 +265,8 @@ export const OrdersPage = () => {
                 </div>
               )}
 
-              <button type="submit" className="submit-btn" data-testid="submit-order-btn">
-                Submit Order
+              <button type="submit" className="orders-submit-btn" data-testid="submit-order-btn">
+                Route Order
               </button>
             </form>
           </div>

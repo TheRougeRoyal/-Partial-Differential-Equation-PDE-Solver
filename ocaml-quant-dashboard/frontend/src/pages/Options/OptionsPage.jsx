@@ -56,8 +56,8 @@ export const OptionsPage = () => {
     <div className="options-page" data-testid="options-page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Options Chain</h1>
-          <p className="page-subtitle">Full options data with Greeks analysis</p>
+          <h1 className="page-title">Derivatives Chain</h1>
+          <p className="page-subtitle">Options liquidity, Greeks, implied volatility, and executable spreads</p>
         </div>
         <div className="page-actions">
           <button className="asset-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
@@ -154,7 +154,7 @@ export const OptionsPage = () => {
       <div className="greeks-legend" data-testid="greeks-legend">
         <div className="greeks-title">
           <Link2 size={14} style={{ marginRight: 8, verticalAlign: 'middle' }} />
-          Greeks Reference
+          Risk Greeks Reference
         </div>
         <div className="greeks-grid">
           {GREEKS.map((greek, index) => (

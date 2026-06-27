@@ -14,75 +14,101 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  Menu,
+  X,
 } from 'lucide-react';
+import { useState } from 'react';
 import './Sidebar.css';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: LayoutDashboard, shortcut: 'g→d' },
-  { path: '/portfolio', label: 'Portfolio', icon: Briefcase, shortcut: 'g→p' },
-  { path: '/options', label: 'Options Chain', icon: Link2, shortcut: 'g→o' },
-  { path: '/pricing', label: 'Price Options', icon: Calculator, shortcut: 'g→r' },
-  { path: '/signals', label: 'Signals', icon: Signal, shortcut: 'g→s' },
-  { path: '/orders', label: 'Orders', icon: FileText, shortcut: 'g→x' },
-  { path: '/backtest', label: 'Backtest', icon: History, shortcut: 'g→b' },
-  { path: '/live', label: 'Live Trading', icon: Radio, shortcut: 'g→l' },
+  { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/portfolio', label: 'Portfolio', icon: Briefcase },
+  { path: '/options', label: 'Derivatives Chain', icon: Link2 },
+  { path: '/pricing', label: 'Pricing Engine', icon: Calculator },
+  { path: '/signals', label: 'Algo Signals', icon: Signal },
+  { path: '/orders', label: 'Execution Blotter', icon: FileText },
+  { path: '/backtest', label: 'Strategy Lab', icon: History },
+  { path: '/live', label: 'Trading Desk', icon: Radio },
 ];
 
 export const Sidebar = ({ collapsed, onToggle }) => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`} data-testid="sidebar">
-      <div className="sidebar-brand">
-        <Zap className="brand-icon" />
-        <div className="brand-text">
-          <span>AlgoTrader</span>
-          <span className="brand-subtitle">PDE-Powered</span>
-        </div>
-      </div>
-
+    <>
+      {/* Mobile hamburger */}
       <button
-        className="sidebar-toggle"
-        onClick={onToggle}
-        data-testid="sidebar-toggle"
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        className="sidebar-mobile-toggle"
+        onClick={() => setMobileOpen(!mobileOpen)}
+        aria-label="Toggle navigation"
       >
-        {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      <nav className="sidebar-nav">
-        <div className="nav-section">
-          <div className="nav-section-title">Navigation</div>
-          {navItems.map((item) => (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
-              data-testid={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
-            >
-              <item.icon className="nav-icon" size={18} />
-              <span>{item.label}</span>
-              <span className="nav-shortcut">{item.shortcut}</span>
-            </NavLink>
-          ))}
-        </div>
-      </nav>
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-      <div className="sidebar-footer">
-        <div className="connection-status">
-          <span className="status-dot" data-testid="connection-status" />
-          <span className="connection-text">Connected</span>
+      <aside
+        className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}
+        data-testid="sidebar"
+      >
+        {/* Brand */}
+        <div className="sidebar-brand">
+          <div className="brand-logo">
+            <span className="brand-logo-symbol">∂</span>
+          </div>
+          <div className="brand-text">
+            <span className="brand-name">PDE Solver</span>
+            <span className="brand-subtitle">Quant Dashboard</span>
+          </div>
         </div>
-        <button
-          className="theme-toggle"
-          onClick={toggleTheme}
-          data-testid="theme-toggle"
-          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        >
-          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
-      </div>
-    </aside>
+
+        {/* Navigation */}
+        <nav className="sidebar-nav">
+          <div className="nav-section">
+            <div className="nav-section-title">Navigation</div>
+            {navItems.map((item) => (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                data-testid={`nav-${item.label.toLowerCase().replace(/\s/g, '-')}`}
+                onClick={() => setMobileOpen(false)}
+              >
+                <div className="nav-active-indicator" />
+                <item.icon className="nav-icon" size={17} />
+                <span className="nav-label">{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </nav>
+
+        {/* Bottom Status Section */}
+        <div className="sidebar-bottom">
+          <div className="sidebar-divider" />
+
+          <div className="sidebar-footer">
+            <button
+              className="theme-toggle"
+              onClick={toggleTheme}
+              data-testid="theme-toggle"
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+              <span className="theme-toggle-label">
+                {theme === 'dark' ? 'Light' : 'Dark'}
+              </span>
+            </button>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 };

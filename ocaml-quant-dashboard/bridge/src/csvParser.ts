@@ -25,7 +25,7 @@ const cache: DataCache = {
   lastUpdated: new Map(),
 };
 
-const CACHE_TTL = 5000; // 5 seconds
+const CACHE_TTL = 60000;
 
 // Configurable data directory
 let dataDir = path.join(__dirname, '../../sample_data');
@@ -194,15 +194,17 @@ function filterData<T extends { timestamp: string; asset?: string; model?: strin
     filtered = filtered.filter((r) => new Date(r.timestamp) <= toDate);
   }
 
-  // Filter by experiment_id if applicable
+  if (filtered.length === 0) return filtered;
+
   if (params.experiment_id && 'experiment_id' in filtered[0]) {
     filtered = filtered.filter(
       (r: any) => r.experiment_id === params.experiment_id
     );
   }
 
-  // Filter by option_id if applicable
-  if (params.option_id && 'option_id' in (filtered[0] || {})) {
+  if (filtered.length === 0) return filtered;
+
+  if (params.option_id && 'option_id' in filtered[0]) {
     filtered = filtered.filter((r: any) => r.option_id === params.option_id);
   }
 

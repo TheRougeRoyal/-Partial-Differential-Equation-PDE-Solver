@@ -53,7 +53,7 @@ export const PortfolioPage = () => {
       <div className="page-header">
         <div>
           <h1 className="page-title">Portfolio</h1>
-          <p className="page-subtitle">Holdings overview and asset allocation</p>
+          <p className="page-subtitle">Live exposure, strategy allocation, and realized/unrealized P&L</p>
         </div>
         <div className="page-actions">
           <button className="asset-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
@@ -69,7 +69,7 @@ export const PortfolioPage = () => {
         <div className="summary-card" data-testid="summary-total-value">
           <div className="summary-label">
             <Wallet size={12} />
-            Total Value
+            Net Liquidation
           </div>
           <div className="summary-value">{formatCurrency(summary.totalValue)}</div>
         </div>
@@ -90,7 +90,7 @@ export const PortfolioPage = () => {
         <div className="summary-card" data-testid="summary-positions">
           <div className="summary-label">
             <BarChart3 size={12} />
-            Open Positions
+            Active Positions
           </div>
           <div className="summary-value">{summary.openPositions}</div>
         </div>
@@ -106,7 +106,7 @@ export const PortfolioPage = () => {
 
       <div className="content-grid">
         <div className="allocation-section" data-testid="allocation-section">
-          <div className="section-title">Asset Allocation</div>
+          <div className="section-title">Strategy Allocation</div>
           <div className="allocation-chart">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -125,11 +125,13 @@ export const PortfolioPage = () => {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: 'var(--surface)',
-                    border: '1px solid var(--border)',
+                    background: 'rgba(15, 20, 25, 0.95)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
                     borderRadius: '8px',
                     fontFamily: 'JetBrains Mono',
                     fontSize: '12px',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
                   }}
                   formatter={(value) => [`${value.toFixed(1)}%`, 'Allocation']}
                 />
@@ -149,7 +151,7 @@ export const PortfolioPage = () => {
 
         <div className="positions-section" data-testid="positions-section">
           <div className="section-header">
-            <div className="section-title">Positions</div>
+            <div className="section-title">Live Positions</div>
           </div>
           <div className="positions-table">
             <div className="positions-header">

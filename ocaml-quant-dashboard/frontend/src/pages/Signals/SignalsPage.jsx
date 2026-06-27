@@ -77,100 +77,134 @@ export const SignalsPage = () => {
 
   return (
     <div className="signals-page" data-testid="signals-page">
-      <div className="page-header">
-        <div>
-          <h1 className="page-title">Trading Signals</h1>
-          <p className="page-subtitle">AI-powered market signal feed</p>
+      {/* ── Header ── */}
+      <div className="signals-page-header">
+        <div className="signals-title-group">
+          <div className="signals-icon-wrap">
+            <Signal size={20} className="signals-radar-icon" />
+            <span className="signals-radar-ping" />
+          </div>
+          <div>
+            <h1 className="signals-page-title">Signal Feed</h1>
+            <p className="signals-page-subtitle">Strategy-ranked trade signals and model conviction · live</p>
+          </div>
         </div>
-        <div className="page-actions">
-          <button className="asset-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
-            <Download size={14} /> CSV
+        <div className="signals-header-actions">
+          <button className="signals-export-btn" onClick={handleExportCSV} data-testid="export-csv-btn">
+            <Download size={13} />
+            <span>CSV</span>
+          </button>
+          <button className="signals-export-btn" onClick={handleExportJSON}>
+            <Download size={13} />
+            <span>JSON</span>
           </button>
         </div>
       </div>
 
-      <div className="stats-grid">
-        <div className="stat-card buy" data-testid="stat-buy">
-          <div className="stat-label">Buy Signals</div>
-          <div className="stat-value buy">{stats.buyCount}</div>
+      {/* ── Stats Strip ── */}
+      <div className="signals-stats-strip">
+        <div className="signals-stat-card" data-testid="stat-buy">
+          <span className="signals-stat-dot dot-buy" />
+          <div className="signals-stat-info">
+            <span className="signals-stat-label">BUY</span>
+            <span className="signals-stat-value value-buy">{stats.buyCount}</span>
+          </div>
         </div>
-        <div className="stat-card sell" data-testid="stat-sell">
-          <div className="stat-label">Sell Signals</div>
-          <div className="stat-value sell">{stats.sellCount}</div>
+        <div className="signals-stat-card" data-testid="stat-sell">
+          <span className="signals-stat-dot dot-sell" />
+          <div className="signals-stat-info">
+            <span className="signals-stat-label">SELL</span>
+            <span className="signals-stat-value value-sell">{stats.sellCount}</span>
+          </div>
         </div>
-        <div className="stat-card hold" data-testid="stat-hold">
-          <div className="stat-label">Hold Signals</div>
-          <div className="stat-value hold">{stats.holdCount}</div>
+        <div className="signals-stat-card" data-testid="stat-hold">
+          <span className="signals-stat-dot dot-hold" />
+          <div className="signals-stat-info">
+            <span className="signals-stat-label">HOLD</span>
+            <span className="signals-stat-value value-hold">{stats.holdCount}</span>
+          </div>
         </div>
-        <div className="stat-card" data-testid="stat-confidence">
-          <div className="stat-label">Avg Confidence</div>
-          <div className="stat-value">{stats.avgConfidence.toFixed(1)}%</div>
+        <div className="signals-stat-card" data-testid="stat-confidence">
+          <span className="signals-stat-dot dot-conf" />
+          <div className="signals-stat-info">
+            <span className="signals-stat-label">AVG CONF</span>
+            <span className="signals-stat-value">{stats.avgConfidence.toFixed(1)}%</span>
+          </div>
         </div>
       </div>
 
-      <div className="signals-content">
-        <div className="signals-filters">
-          <div className="filter-group">
-            <span className="filter-label">Asset</span>
-            <select
-              className="filter-select"
-              value={assetFilter}
-              onChange={(e) => setAssetFilter(e.target.value)}
-              data-testid="asset-filter"
-            >
-              {ASSETS.map(a => (
-                <option key={a} value={a}>{a === 'all' ? 'All Assets' : a}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <span className="filter-label">Action</span>
-            <div className="toggle-group">
-              {ACTIONS.map(action => (
-                <button
-                  key={action}
-                  className={`toggle-btn ${actionFilter === action ? 'active' : ''}`}
-                  onClick={() => setActionFilter(action)}
-                  data-testid={`action-toggle-${action}`}
-                >
-                  {action}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* ── Floating Filter Toolbar ── */}
+      <div className="signals-toolbar">
+        <div className="signals-filter-section">
+          <span className="signals-filter-label">ASSET</span>
+          <select
+            className="signals-filter-select"
+            value={assetFilter}
+            onChange={(e) => setAssetFilter(e.target.value)}
+            data-testid="asset-filter"
+          >
+            {ASSETS.map(a => (
+              <option key={a} value={a}>{a === 'all' ? 'All Assets' : a}</option>
+            ))}
+          </select>
         </div>
 
-        <div className="signals-list">
-          {filteredSignals.map((signal, index) => (
-            <div className={`signal-card ${signal.action}`} key={signal.id} data-testid={`signal-card-${index}`}>
-              <div className="signal-header">
-                <div className="signal-meta">
-                  <span className={`action-badge ${signal.action}`}>{signal.action}</span>
-                  <span className="signal-asset">{signal.asset}</span>
-                  <span className="signal-time">{formatDateTime(signal.timestamp)}</span>
-                </div>
-                <div className="signal-price">{formatCurrency(signal.price)}</div>
+        <div className="signals-filter-divider" />
+
+        <div className="signals-filter-section">
+          <span className="signals-filter-label">SIGNAL</span>
+          <div className="signals-toggle-group">
+            {ACTIONS.map(action => (
+              <button
+                key={action}
+                className={`signals-toggle-btn ${actionFilter === action ? 'active' : ''} ${action !== 'all' ? action : ''}`}
+                onClick={() => setActionFilter(action)}
+                data-testid={`action-toggle-${action}`}
+              >
+                {action}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Signal Feed ── */}
+      <div className="signals-feed">
+        {filteredSignals.map((signal, index) => (
+          <div
+            className={`signal-row ${signal.action}`}
+            key={signal.id}
+            data-testid={`signal-card-${index}`}
+            style={{ animationDelay: `${Math.min(index * 0.04, 0.8)}s` }}
+          >
+            <div className={`signal-row-bar bar-${signal.action}`} />
+
+            <div className="signal-row-content">
+              <div className="signal-row-top">
+                <span className={`signal-action-badge badge-${signal.action}`}>{signal.action}</span>
+                <span className="signal-row-asset">{signal.asset}</span>
+                <span className="signal-row-time">{formatDateTime(signal.timestamp)}</span>
               </div>
-              <div className="signal-body">
-                <p className="signal-reason">{signal.reason}</p>
+              <div className="signal-row-middle">
+                <p className="signal-row-reason">{signal.reason}</p>
               </div>
-              <div className="signal-footer">
-                <div className="confidence-wrapper">
-                  <span className="confidence-label">Confidence</span>
-                  <div className="confidence-bar">
+              <div className="signal-row-bottom">
+                <span className="signal-row-price">{formatCurrency(signal.price)}</span>
+                <div className="signal-row-confidence">
+                  <span className="confidence-lbl">CONF</span>
+                  <div className="confidence-track">
                     <div
-                      className={`confidence-fill ${getConfidenceClass(signal.confidence)}`}
+                      className={`confidence-bar-fill ${getConfidenceClass(signal.confidence)}`}
                       style={{ width: `${signal.confidence}%` }}
                     />
                   </div>
-                  <span className="confidence-value">{signal.confidence.toFixed(0)}%</span>
+                  <span className="confidence-pct">{signal.confidence.toFixed(0)}%</span>
                 </div>
-                <span className="model-tag">{signal.model}</span>
+                <span className="signal-row-model">{signal.model}</span>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );
