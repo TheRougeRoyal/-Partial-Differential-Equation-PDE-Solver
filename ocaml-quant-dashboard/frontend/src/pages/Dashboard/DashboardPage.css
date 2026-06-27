@@ -108,7 +108,7 @@
 }
 
 .metric-card:hover {
-  border-color: var(--border-glow);
+  border-color: var(--accent-dim);
 }
 
 .metric-card-header {
@@ -190,14 +190,14 @@
 .metric-sparkline-fill {
   height: 100%;
   border-radius: 2px;
-  background: linear-gradient(90deg, #00b4d8, #00d4aa);
+  background: #00b4d8;
   opacity: 0.50;
 }
 
-.metric-sparkline-fill.green { background: linear-gradient(90deg, #00d4aa, #00d4aa80); }
-.metric-sparkline-fill.amber { background: linear-gradient(90deg, #fbbf24, #fbbf2480); }
-.metric-sparkline-fill.red   { background: linear-gradient(90deg, #ff4757, #ff475780); }
-.metric-sparkline-fill.cyan  { background: linear-gradient(90deg, #00b4d8, #00b4d880); }
+.metric-sparkline-fill.green { background: #00d4aa; }
+.metric-sparkline-fill.amber { background: #fbbf24; }
+.metric-sparkline-fill.red   { background: #ff4757; }
+.metric-sparkline-fill.cyan  { background: #00b4d8; }
 
 /* ============================================================
    CHART SECTION
@@ -210,20 +210,7 @@
   border: 1px solid rgba(48, 54, 61, 0.50);
   border-radius: 10px;
   padding: 20px;
-  animation: dashSlideUp 0.55s ease-out both;
-  animation-delay: 0.22s;
   overflow: hidden;
-}
-
-.chart-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #00b4d8, #8b5cf6, #00d4aa);
-  border-radius: 10px 10px 0 0;
 }
 
 .section-title {
@@ -272,8 +259,8 @@
   border-radius: 3px;
 }
 
-.legend-dot.actual    { background: #00b4d8; box-shadow: 0 0 6px rgba(0, 180, 216, 0.40); }
-.legend-dot.predicted { background: #00d4aa; box-shadow: 0 0 6px rgba(0, 212, 170, 0.40); }
+.legend-dot.actual    { background: #00b4d8; }
+.legend-dot.predicted { background: #00d4aa; }
 
 /* ============================================================
    SYSTEM PERFORMANCE MINI-SECTION
@@ -282,8 +269,6 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
-  animation: dashSlideUp 0.55s ease-out both;
-  animation-delay: 0.28s;
 }
 
 .sys-perf-card {
@@ -343,8 +328,6 @@
   border: 1px solid rgba(48, 54, 61, 0.50);
   border-radius: 10px;
   overflow: hidden;
-  animation: dashSlideUp 0.6s ease-out both;
-  animation-delay: 0.30s;
 }
 
 .predictions-table .section-title {
@@ -419,18 +402,15 @@
 }
 
 .confidence-fill.high {
-  background: linear-gradient(90deg, #00d4aa, #00d4aa90);
-  box-shadow: 0 0 6px rgba(0, 212, 170, 0.30);
+  background: #00d4aa;
 }
 
 .confidence-fill.medium {
-  background: linear-gradient(90deg, #fbbf24, #fbbf2490);
-  box-shadow: 0 0 6px rgba(251, 191, 36, 0.25);
+  background: #fbbf24;
 }
 
 .confidence-fill.low {
-  background: linear-gradient(90deg, #ff4757, #ff475790);
-  box-shadow: 0 0 6px rgba(255, 71, 87, 0.25);
+  background: #ff4757;
 }
 
 /* ============================================================

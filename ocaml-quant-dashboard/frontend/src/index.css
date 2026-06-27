@@ -16,8 +16,6 @@
   /* Borders */
   --border: #1e2a3a;
   --border-subtle: #151d2a;
-  --border-glow: rgba(0, 180, 216, 0.15);
-  --border-glow-strong: rgba(0, 180, 216, 0.35);
 
   /* Text */
   --text-primary: #e6edf3;
@@ -29,20 +27,16 @@
   --accent: #00b4d8;
   --accent-hover: #00c9f0;
   --accent-dim: rgba(0, 180, 216, 0.15);
-  --accent-glow: rgba(0, 180, 216, 0.25);
 
   /* Semantic Colors */
   --success: #00d4aa;
   --success-dim: rgba(0, 212, 170, 0.1);
-  --success-glow: rgba(0, 212, 170, 0.25);
 
   --danger: #ff4757;
   --danger-dim: rgba(255, 71, 87, 0.1);
-  --danger-glow: rgba(255, 71, 87, 0.25);
 
   --warning: #fbbf24;
   --warning-dim: rgba(251, 191, 36, 0.1);
-  --warning-glow: rgba(251, 191, 36, 0.25);
 
   /* Chart Colors */
   --chart-grid: rgba(30, 42, 58, 0.5);
@@ -54,8 +48,6 @@
   --chart-area-1: rgba(0, 180, 216, 0.15);
   --chart-area-2: rgba(0, 212, 170, 0.1);
   --chart-area-3: rgba(251, 191, 36, 0.08);
-  --chart-gradient-start: rgba(0, 180, 216, 0.3);
-  --chart-gradient-end: rgba(0, 180, 216, 0.0);
 
   /* Glassmorphism */
   --glass-bg: rgba(15, 20, 25, 0.7);
@@ -66,7 +58,6 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(0, 180, 216, 0.1);
 
   /* Spacing */
   --sidebar-width: 240px;
@@ -94,8 +85,6 @@ html.light {
 
   --border: #d1d9e0;
   --border-subtle: #e4e9ef;
-  --border-glow: rgba(0, 140, 180, 0.12);
-  --border-glow-strong: rgba(0, 140, 180, 0.25);
 
   --text-primary: #1a202c;
   --text-secondary: #5a6577;
@@ -105,19 +94,15 @@ html.light {
   --accent: #0891b2;
   --accent-hover: #0e7490;
   --accent-dim: rgba(8, 145, 178, 0.1);
-  --accent-glow: rgba(8, 145, 178, 0.15);
 
   --success: #059669;
   --success-dim: rgba(5, 150, 105, 0.08);
-  --success-glow: rgba(5, 150, 105, 0.15);
 
   --danger: #dc2626;
   --danger-dim: rgba(220, 38, 38, 0.08);
-  --danger-glow: rgba(220, 38, 38, 0.15);
 
   --warning: #d97706;
   --warning-dim: rgba(217, 119, 6, 0.08);
-  --warning-glow: rgba(217, 119, 6, 0.15);
 
   --chart-grid: rgba(209, 217, 224, 0.6);
 
@@ -127,7 +112,6 @@ html.light {
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-glow: 0 0 20px rgba(8, 145, 178, 0.06);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -152,8 +136,6 @@ body {
   line-height: 1.6;
   color: var(--text-primary);
   background: var(--background);
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(0, 180, 216, 0.03) 0%, transparent 70%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
@@ -318,22 +300,6 @@ code {
   }
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
 /* ═══════════════════════════════════════════════════════════════
    GLASSMORPHISM UTILITIES
    ═══════════════════════════════════════════════════════════════ */
@@ -357,15 +323,6 @@ code {
 .glass-surface {
   background: var(--surface);
   border: 1px solid var(--border);
-}
-
-.glow-border {
-  border: 1px solid var(--border);
-  transition: border-color var(--transition-base);
-}
-
-.glow-border:hover {
-  border-color: var(--border-glow);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -416,7 +373,6 @@ code {
 /* Animation Utilities */
 .animate-fadeIn { animation: fadeIn 0.3s ease forwards; }
 .animate-slideUp { animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
-.animate-pulse { animation: pulse 2s ease-in-out infinite; }
 
 /* ═══════════════════════════════════════════════════════════════
    COMMON COMPONENTS
@@ -444,7 +400,6 @@ code {
 .asset-btn:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
-  border-color: var(--border-glow);
 }
 
 .asset-btn.active {
@@ -462,7 +417,7 @@ code {
 }
 
 .card:hover {
-  border-color: var(--border-glow);
+  border-color: var(--accent-dim);
 }
 
 .section-divider {
@@ -475,15 +430,12 @@ code {
 .asset-btn:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
-  border-color: var(--border-glow);
-  box-shadow: 0 0 12px var(--accent-dim);
 }
 
 .asset-btn.active {
   background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent);
-  box-shadow: 0 0 16px var(--accent-dim);
 }
 
 /* Card base */
@@ -492,10 +444,9 @@ code {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+  transition: border-color var(--transition-base);
 }
 
 .card:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--accent-dim);
 }

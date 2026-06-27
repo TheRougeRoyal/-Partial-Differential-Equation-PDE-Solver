@@ -108,16 +108,11 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   transition: all 0.25s ease;
-  box-shadow:
-    0 0 16px rgba(0, 180, 216, 0.2),
-    0 0 4px rgba(0, 180, 216, 0.3);
 }
 
 .orders-new-btn:hover {
   transform: translateY(-1px);
-  box-shadow:
-    0 0 24px rgba(0, 180, 216, 0.35),
-    0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* ═══════════════════════  TABLE  ═══════════════════════ */
@@ -161,18 +156,6 @@
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
   transition: all 0.2s ease;
-  animation: orderRowIn 0.3s ease-out both;
-}
-
-@keyframes orderRowIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .orders-tbl-row:last-child {
@@ -190,8 +173,8 @@
   align-self: stretch;
 }
 
-.indicator-buy  { background: var(--ord-green); box-shadow: 0 0 8px rgba(0, 212, 170, 0.25); }
-.indicator-sell { background: var(--ord-red);   box-shadow: 0 0 8px rgba(255, 71, 87, 0.25); }
+.indicator-buy  { background: var(--ord-green); }
+.indicator-sell { background: var(--ord-red); }
 
 /* ── Table Cells ── */
 .orders-td {
@@ -281,20 +264,6 @@
   text-decoration: line-through;
 }
 
-/* Pulsing dot for pending orders */
-.status-pulse {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--ord-amber);
-  animation: pendingPulse 1.6s ease-in-out infinite;
-}
-
-@keyframes pendingPulse {
-  0%, 100% { opacity: 1; box-shadow: 0 0 4px rgba(251, 191, 36, 0.5); }
-  50%      { opacity: 0.4; box-shadow: 0 0 8px rgba(251, 191, 36, 0.8); }
-}
-
 /* ── Cancel Button ── */
 .orders-cancel-btn {
   padding: 4px 12px;
@@ -314,7 +283,6 @@
 .orders-cancel-btn:hover:not(:disabled) {
   background: rgba(255, 71, 87, 0.1);
   border-color: var(--ord-red);
-  box-shadow: 0 0 10px rgba(255, 71, 87, 0.15);
 }
 
 .orders-cancel-btn:disabled {
@@ -460,7 +428,6 @@
 .orders-form-input:focus {
   outline: none;
   border-color: var(--ord-cyan);
-  box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1), 0 0 12px rgba(0, 180, 216, 0.08);
 }
 
 .orders-form-input::placeholder {
@@ -504,18 +471,12 @@
   border-color: var(--ord-green);
   background: rgba(0, 212, 170, 0.08);
   color: var(--ord-green);
-  box-shadow:
-    0 0 16px rgba(0, 212, 170, 0.12),
-    inset 0 0 20px rgba(0, 212, 170, 0.04);
 }
 
 .side-sell-btn.active {
   border-color: var(--ord-red);
   background: rgba(255, 71, 87, 0.08);
   color: var(--ord-red);
-  box-shadow:
-    0 0 16px rgba(255, 71, 87, 0.12),
-    inset 0 0 20px rgba(255, 71, 87, 0.04);
 }
 
 /* ── Submit Button ── */
@@ -533,16 +494,11 @@
   letter-spacing: 0.12em;
   transition: all 0.25s ease;
   margin-top: 6px;
-  box-shadow:
-    0 0 14px rgba(0, 180, 216, 0.15),
-    0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .orders-submit-btn:hover {
   transform: translateY(-1px);
-  box-shadow:
-    0 0 24px rgba(0, 180, 216, 0.25),
-    0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
 }
 
 .orders-submit-btn:active {

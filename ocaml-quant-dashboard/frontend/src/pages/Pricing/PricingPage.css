@@ -2,25 +2,6 @@
    PDE PRICING ENGINE — Premium Algo Trading Platform
    ═══════════════════════════════════════════════════════════════ */
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes resultReveal {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-
 .pricing-page {
   display: flex;
   flex-direction: column;
@@ -46,7 +27,6 @@
   display: grid;
   grid-template-columns: 1fr 1.5fr;
   gap: 20px;
-  animation: slideUp 0.5s ease-out 0.1s both;
 }
 
 /* ─── Input Panel ─── */
@@ -59,16 +39,6 @@
   border-radius: 12px;
   padding: 24px;
   overflow: hidden;
-}
-
-.input-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.4), transparent);
 }
 
 .panel-title {
@@ -126,7 +96,6 @@
 .input-field:focus {
   outline: none;
   border-color: rgba(0, 180, 216, 0.5);
-  box-shadow: 0 0 12px rgba(0, 180, 216, 0.1);
 }
 
 .input-row {
@@ -162,7 +131,6 @@
 .radio-input:checked {
   border-color: var(--accent, #00b4d8);
   background: var(--accent, #00b4d8);
-  box-shadow: inset 0 0 0 3px rgba(10, 14, 23, 0.8), 0 0 8px rgba(0, 180, 216, 0.3);
 }
 
 .radio-label {
@@ -189,8 +157,6 @@
 
 .calculate-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 180, 216, 0.25);
-  background: linear-gradient(135deg, rgba(0, 180, 216, 0.9), rgba(0, 212, 170, 0.7));
 }
 
 .calculate-btn:disabled {
@@ -210,16 +176,6 @@
   border-radius: 12px;
   padding: 24px;
   overflow: hidden;
-}
-
-.results-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 170, 0.4), transparent);
 }
 
 .results-header {
@@ -257,7 +213,6 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin-bottom: 28px;
-  animation: resultReveal 0.4s ease-out;
 }
 
 .price-card {
@@ -271,21 +226,9 @@
   overflow: hidden;
 }
 
-.price-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.4), transparent);
-}
-
 .price-card:hover {
   transform: translateY(-2px);
   border-color: rgba(0, 180, 216, 0.12);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .price-label {
@@ -308,12 +251,10 @@
 
 .price-value.accent {
   color: var(--accent, #00b4d8);
-  text-shadow: 0 0 16px rgba(0, 180, 216, 0.25);
 }
 
 .price-value.success {
   color: var(--success, #00d4aa);
-  text-shadow: 0 0 16px rgba(0, 212, 170, 0.25);
 }
 
 /* ─── Greeks Results ─── */
@@ -321,7 +262,6 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 12px;
-  animation: resultReveal 0.4s ease-out 0.1s both;
 }
 
 .greek-card {
@@ -332,30 +272,11 @@
   padding: 18px 12px;
   text-align: center;
   transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.greek-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 30px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--accent, #00b4d8), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 .greek-card:hover {
   transform: translateY(-3px);
   border-color: rgba(0, 180, 216, 0.15);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
-
-.greek-card:hover::before {
-  opacity: 1;
 }
 
 .greek-symbol {
@@ -364,7 +285,6 @@
   font-weight: 700;
   color: var(--accent, #00b4d8);
   margin-bottom: 4px;
-  text-shadow: 0 0 12px rgba(0, 180, 216, 0.3);
 }
 
 .greek-name {

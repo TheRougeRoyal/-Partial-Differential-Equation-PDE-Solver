@@ -51,10 +51,6 @@ export const Layout = () => {
         </div>
 
         <div className="header-right">
-          <div className="header-live-badge">
-            <span className="live-pulse-dot" />
-            <span>LIVE</span>
-          </div>
           <div>
             <span className="header-clock">{formatTime(currentTime)}</span>
             <span className="header-clock-label">UTC</span>

@@ -148,7 +148,6 @@ export const OrdersPage = () => {
                 </div>
                 <div className="orders-td td-center">
                   <span className={`orders-status-badge status-${order.status}`}>
-                    {order.status === 'pending' && <span className="status-pulse" />}
                     {order.status}
                   </span>
                 </div>

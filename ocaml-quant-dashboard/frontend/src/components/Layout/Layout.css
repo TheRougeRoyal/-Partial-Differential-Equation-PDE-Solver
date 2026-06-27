@@ -63,29 +63,7 @@
   gap: 20px;
 }
 
-.header-live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  background: var(--success-dim);
-  border: 1px solid rgba(0, 212, 170, 0.2);
-  border-radius: 100px;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--success);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
 
-.live-pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--success);
-  animation: pulseRing 2s ease-in-out infinite;
-  flex-shrink: 0;
-}
 
 .header-clock {
   font-size: 13px;
@@ -117,7 +95,6 @@
 .page-container {
   padding: 24px;
   max-width: 1800px;
-  animation: fadeIn 0.3s ease;
 }
 
 .page-header {

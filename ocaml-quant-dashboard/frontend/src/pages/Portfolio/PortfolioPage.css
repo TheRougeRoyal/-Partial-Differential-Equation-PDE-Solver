@@ -2,16 +2,6 @@
    PORTFOLIO ANALYTICS — Premium Algo Trading Platform
    ═══════════════════════════════════════════════════════════════ */
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .portfolio-page {
   display: flex;
   flex-direction: column;
@@ -75,7 +65,6 @@
   background: rgba(0, 180, 216, 0.1);
   border-color: rgba(0, 180, 216, 0.3);
   color: var(--accent, #00b4d8);
-  box-shadow: 0 0 12px rgba(0, 180, 216, 0.1);
 }
 
 /* ─── Summary Metrics Grid ─── */
@@ -83,7 +72,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  animation: slideUp 0.5s ease-out 0.1s both;
 }
 
 .summary-card {
@@ -98,26 +86,9 @@
   overflow: hidden;
 }
 
-.summary-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.4), transparent);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
 .summary-card:hover {
   transform: translateY(-3px);
   border-color: rgba(0, 180, 216, 0.15);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 180, 216, 0.05);
-}
-
-.summary-card:hover::before {
-  opacity: 1;
 }
 
 .summary-label {
@@ -149,12 +120,10 @@
 
 .summary-value.positive {
   color: var(--success, #00d4aa);
-  text-shadow: 0 0 20px rgba(0, 212, 170, 0.2);
 }
 
 .summary-value.negative {
   color: var(--danger, #ff4757);
-  text-shadow: 0 0 20px rgba(255, 71, 87, 0.2);
 }
 
 .summary-change {
@@ -178,7 +147,6 @@
   display: grid;
   grid-template-columns: 1fr 1.2fr;
   gap: 20px;
-  animation: slideUp 0.5s ease-out 0.2s both;
 }
 
 /* ─── Allocation Section ─── */
@@ -191,16 +159,6 @@
   border-radius: 12px;
   padding: 24px;
   overflow: hidden;
-}
-
-.allocation-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 212, 170, 0.3), transparent);
 }
 
 .section-title {
@@ -244,7 +202,6 @@
   width: 10px;
   height: 10px;
   border-radius: 3px;
-  box-shadow: 0 0 6px currentColor;
 }
 
 .allocation-name {
@@ -269,17 +226,6 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   overflow: hidden;
-}
-
-.positions-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.3), transparent);
-  z-index: 1;
 }
 
 .section-header {
@@ -349,12 +295,10 @@
 
 .position-cell.positive {
   color: var(--success, #00d4aa);
-  text-shadow: 0 0 8px rgba(0, 212, 170, 0.15);
 }
 
 .position-cell.negative {
   color: var(--danger, #ff4757);
-  text-shadow: 0 0 8px rgba(255, 71, 87, 0.15);
 }
 
 .asset-name {
